@@ -8,5 +8,5 @@ standardized modules and capabilities.
 * [`design`](./spec/design.md) describes the basic motivations and design
   directions of VT6.
 
-* [`core`](./spec/core1.md) defines the fundamental interface contracts between
+* [`core`](./spec/draft/core0.md) (*draft*) defines the fundamental interface contracts between
   VT6 providers and consumers.
