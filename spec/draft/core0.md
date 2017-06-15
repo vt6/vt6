@@ -23,10 +23,8 @@ These objects shall be called this client's **VT6 input** and **VT6 output**, re
 If the platform allows VT6 client processes to be started while a VT6 server is not present, the client process MUST have a method to determine whether a VT6 server is present.
 It SHALL then not be considered a VT6 client for the purpose of this specification, and any other specifications that inherit the meaning of the term "VT6 client" from it.
 
-If a VT6 client has access to and is using a VT6 input and VT6 output, it is said to be operating in **FOO mode**.
-Otherwise, it is said to be operating in **BAR mode**.
-
-<p style="color:red">TODO: choose good names for those two modes</p>
+If a VT6 client has access to and is using a VT6 input and VT6 output, it is said to be operating in **normal mode**.
+Otherwise, it is said to be operating in **multiplexed mode**.
 
 ### 1.1. POSIX platform
 
@@ -37,11 +35,11 @@ POSIX allows processes to be started while a VT6 server is not present.
 Therefore, VT6 clients MUST use the following method to determine whether a VT6 server is present.
 
 1. If the `VT6` environment variable is present, its content is the absolute path to a socket file.
-   In this case, the VT6 client SHALL assume that a VT6 server is present, and operate in FOO mode.
+   In this case, the VT6 client SHALL assume that a VT6 server is present, and operate in normal mode.
    To obtain the VT6 input and VT6 output, the VT6 client SHALL connect to this socket file with socket type `SOCK_SEQPACKET`, and upon success, use the open socket as both VT6 input and VT6 output.
    When the connection to the socket fails, the VT6 client MAY either bail out, or continue to operate as if a VT6 server is absent.
 
-2. If the `TERM` environment variable is present and contains the string `vt6`, the VT6 client MAY operate in BAR mode.
-   In this case, the VT6 client SHALL assume that a VT6 server is present, and operate in BAR mode.
+2. If the `TERM` environment variable is present and contains the string `vt6`, the VT6 client MAY operate in multiplexed mode.
+   In this case, the VT6 client SHALL assume that a VT6 server is present, and operate in multiplexed mode.
 
 3. If the `VT6` environment variable is absent and the `TERM` environment variable does not contain the string `vt6`, the VT6 client MUST consider the VT6 server to be absent.
