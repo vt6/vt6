@@ -1,9 +1,9 @@
-all: logo-dark.svgz logo-light.svgz logo-dark.png logo-light.png logo-dark-wide.svgz logo-light-wide.svgz logo-dark-wide.png logo-light-wide.png
+all: $(foreach color,dark light,$(foreach type,square plain wide,$(foreach ext,svgz png,logo-$(color)-$(type).$(ext))))
 
-logo-%-wide.svgz: logo-svg.pl
-	perl $< $* wide | gzip > $@
+space = $(null) $(null)
+
 logo-%.svgz: logo-svg.pl
-	perl $< $* square | gzip > $@
+	perl $< $(subst -,$(space),$*) | gzip > $@
 logo-%.png: logo-%.svgz
-	convert $< $@
+	gunzip < $< | convert svg:- $@
 	optipng $@
