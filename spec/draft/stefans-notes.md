@@ -11,6 +11,7 @@ Clients need to...
 * allocate screen areas [3]
 * draw into screen areas, select which screen area stdout draws into
 * watch input events [4] and control echoing
+* submit large screen updates as atomic transactions to avoid tearing ([ref](https://github.com/jwilm/alacritty/issues/598))
 
 Servers need to...
 
