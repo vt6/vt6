@@ -1,9 +1,16 @@
 {{ partial "header" . }}
 <main>
-  <p>Occaecati neque nostrum ratione aperiam ea quia culpa. Est blanditiis aut nostrum rerum expedita voluptatibus explicabo. Possimus et ea rem impedit mollitia. Rerum quo totam aut porro pariatur. Est eveniet et suscipit est perferendis quia. Et maiores beatae occaecati nulla est quo sequi.</p>
-  <p>Quas deserunt sint assumenda est et quo voluptatum. Doloremque a cumque consequatur a labore. Eos quae aut praesentium iusto accusantium.</p>
-  <p>A doloremque dolor eum aspernatur sunt nobis. Quibusdam perferendis dolorum laudantium odio expedita aliquid. Voluptas expedita ullam itaque nesciunt nisi itaque architecto. Dolore expedita vero sit porro aut.</p>
-  <p>Quae accusantium est laborum laborum animi. Natus atque quas cum incidunt est praesentium possimus. Rerum laborum non fuga deleniti voluptas eius quo. Voluptas qui sunt ex et. Totam expedita quo ab ut aut iure odio. Dicta est sit itaque sunt distinctio dignissimos eligendi velit.</p>
-  <p>Facilis ipsa voluptatem earum cumque. Rem libero maxime praesentium quam et. Magnam provident consequatur nulla est sapiente voluptatem autem molestias. Quibusdam impedit explicabo nemo soluta voluptas. Quis et eos saepe ea dolorem beatae. Animi consectetur nihil sunt.</p>
+  <p>The way that text terminals work on UNIX and operating systems derived from it has not fundamentally changed for the last 40 years. Even though security concerns have become a focus of attention, most terminal handling code is still running in kernel space. And even though graphical interfaces have conquered every part of our life, text terminals still struggle to provide consistent true-color support, and cannot display bitmap images reliably.</p>
+  <p>The <strong>VT6 project</strong>, though still in its earliest stages, is working towards a modern protocol for virtual terminals, which, among other things, runs almost entirely in userspace and provides a modular basis on which to serve both legacy clients and forward-looking terminals that want to provide modern capabilities to applications.</p>
+  <p>Development is taking place on <a href="https://github.com/vt6/vt6">GitHub</a>.</p>
+  <h2>Specifications</h2>
+  <ul>
+  {{ range .Data.Pages }}
+    <li>
+      <a href="{{.Permalink}}">{{.Title}} &mdash; {{.Description}}</a>
+      {{- if in (findRE "0$" .Title) "0" }} <em>(Draft)</em>{{ end -}}
+    </li>
+  {{ end }}
+  </ul>
 </main>
 {{ partial "footer" . }}
