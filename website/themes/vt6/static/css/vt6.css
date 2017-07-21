@@ -4,7 +4,7 @@ html {
 body {
   margin: 0;
   font-family: "Source Sans Pro", system-ui, sans-serif;
-  line-height: 1.6;
+  line-height: 1.6rem;
   text-rendering: optimizeLegibility;
   font-variant-ligatures: common-ligatures;
   font-kerning: normal;
@@ -40,9 +40,10 @@ header > h1 {
   color: white;
   margin: 0;
 }
-header > h1 > img {
+header > h1 img {
   height: 96px;
   padding-right: 8px;
+  border: 0 !important;
 }
 header > h1 > div {
   flex: 2 5rem;
@@ -60,4 +61,29 @@ main {
   max-width: 800px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+main p, main ul {
+    font-family: "Source Serif Pro", serif;
+    hyphens: auto;
+    -ms-hyphens: auto;
+    -webkit-hyphens: auto;
+    text-align: justify;
+}
+
+main h1 {
+  font-size: 1.8rem;
+  line-height: 2.4rem;
+}
+main h2 {
+  font-size: 1.5rem;
+  line-height: 2.1rem;
+}
+main h3 {
+  font-size: 1.2rem;
+  line-height: 1.8rem;
+}
+main h4 {
+  font-size: 1rem;
+  line-height: 1.6rem;
 }
