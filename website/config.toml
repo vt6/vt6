@@ -1,0 +1,4 @@
+baseURL = "https://vt6.io/"
+languageCode = "en-us"
+title = "VT6"
+theme = "vt6"

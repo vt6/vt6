@@ -1,0 +1,63 @@
+html {
+  font-size: 18px; /* needs to be set here to establish the correct root-em */
+}
+body {
+  margin: 0;
+  font-family: "Source Sans Pro", system-ui, sans-serif;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: common-ligatures;
+  font-kerning: normal;
+}
+
+header {
+  background: url(/img/logo-dark-plain.png);
+  background-size: contain;
+  margin-left: calc(50vw - 400px);
+  height: 96px;
+  position: relative;
+}
+@media(max-width: 800px) {
+  header {
+    margin-left: 0;
+  }
+}
+header::before {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  width: 100vw;
+  height: 96px;
+  content: " ";
+  background: url(/img/logo-dark-plain.png);
+  background-size: contain;
+  background-position: right;
+}
+
+header > h1 {
+  display: flex;
+  flex-wrap: wrap;
+  color: white;
+  margin: 0;
+}
+header > h1 > img {
+  height: 96px;
+  padding-right: 8px;
+}
+header > h1 > div {
+  flex: 2 5rem;
+}
+header > h1 > div > span {
+  display: table-cell;
+  vertical-align: middle;
+  height: 96px;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  font-weight: normal;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
