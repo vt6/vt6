@@ -1,5 +1,13 @@
 # Stefan's notes
 
+## Prior art
+
+* [TermKit](https://github.com/unconed/TermKit) ([announcement](http://acko.net/blog/on-termkit/)) arrived at a lot of
+  the same design decisions as we already did (separate the view in/out aka VT6 in/out from the data; client-server
+  architecture), but apparently didn't give a f~#$ about backwards compatibility, cf. the mandatory headers like
+  "Content-Type" on stdin/stdout. I would like these very very much, but I don't see how to do this in a
+  backwards-compatible way. [Here's the author explaining why the project failed, BTW.](https://www.reddit.com/r/programming/comments/137kd9/18_months_ago_termkit_a_nextgeneration_terminal/)
+
 ## Known requirements that are not yet accounted for
 
 Clients need to...
@@ -12,6 +20,7 @@ Clients need to...
 * draw into screen areas, select which screen area stdout draws into
 * watch input events [4] and control echoing
 * submit large screen updates as atomic transactions to avoid tearing ([ref](https://github.com/jwilm/alacritty/issues/598))
+* need to know whether stdout is connected to a terminal [5]
 
 Servers need to...
 
@@ -43,3 +52,6 @@ How to determine which programs are eligible for input event watching?
 Unclear: Which input events are protected in which way (e.g. should the
 terminal be able to reserve some keybinding or other input action for scrolling
 the terminal screen (instead of scrolling in a fullscreen application))?
+
+[5] To avoid inline VT6 messages if this is not the case, similar to how
+existing applications use isatty() to determine whether to print in color.
