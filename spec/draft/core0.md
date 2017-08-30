@@ -42,3 +42,22 @@ Therefore, VT6 clients MUST use the following method to determine whether a VT6 
 2. If the `TERM` environment variable is present and contains the string `vt6`, the VT6 client SHALL assume that a VT6 server is present, and operate in multiplexed mode.
 
 3. If the `VT6` environment variable is absent and the `TERM` environment variable does not contain the string `vt6`, the VT6 client MUST consider the VT6 server to be absent.
+
+<!--
+
+TODO: define message format based on s-expressions; example message exchange ("->" is client-to-server, "<-" vice versa):
+
+   ->    (want core1 ui2 cli1)
+   <-    (have core1.3 ui2.5)
+   ->    (core1.subscribe ui2.width ui2.height)
+   <-    (core1.notify ui2.width 80 ui2.height 25)
+
+TODO: define maximum message size, and re-synchronization algorithm as follows:
+
+   1. discard until next "("
+   2. try to parse as message
+   3. if invalid or unknown message, back to step 1
+
+TODO: define "want", "have" messages (the only ones that are unversioned and not bound to a module)
+
+-->
