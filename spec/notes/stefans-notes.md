@@ -1,5 +1,10 @@
 # Stefan's notes
 
+## Learning resources
+
+* [The TTY demystified](http://www.linusakesson.net/programming/tty/)
+* [Proper handling of SIGINT/SIGQUIT](https://www.cons.org/cracauer/sigint.html)
+
 ## Prior art
 
 * [TermKit](https://github.com/unconed/TermKit) ([announcement](http://acko.net/blog/on-termkit/)) arrived at a lot of
