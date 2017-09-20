@@ -52,6 +52,8 @@ TODO: define message format based on s-expressions; example message exchange ("-
    ->    (core1.subscribe ui2.width ui2.height)
    <-    (core1.notify ui2.width 80 ui2.height 25)
 
+NOTE: no need for multiplexing of messages onto standard in/out, or text onto message in/out, unless in multiplexed mode
+
 TODO: define maximum message size, and re-synchronization algorithm as follows:
 
    1. discard until next "("
@@ -59,5 +61,9 @@ TODO: define maximum message size, and re-synchronization algorithm as follows:
    3. if invalid or unknown message, back to step 1
 
 TODO: define "want", "have" messages (the only ones that are unversioned and not bound to a module)
+
+NOTE: Not for this module, but: Syntax highlighting to be achieved by sending a "file type hint" message on message out.
+When multiple programs form a pipe, the latest file type hint (in pipe chronology) wins.
+NOTE: This requires the job control plugin to have a method of establishing a notion of pipe topology on the server.
 
 -->
