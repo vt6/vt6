@@ -63,7 +63,7 @@ main {
   padding: 0 1rem;
 }
 
-main p, main ul {
+main p, main ul, main ol {
     font-family: "Source Serif Pro", serif;
     hyphens: auto;
     -ms-hyphens: auto;

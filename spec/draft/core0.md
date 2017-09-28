@@ -1,7 +1,6 @@
 # `vt6/core0` - Fundamental protocols and interface contracts
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
-All content is normative, except for paragraphs starting with the keyword *Rationale* and sections whose heading starts with the word *Example*.
 
 Refer to this document using the identifier `vt6/core0` or using its canonical URL, <https://vt6.io/std/draft/core0>.
 
@@ -54,7 +53,7 @@ s-expression    = "(" *space 1*( ( s-expression / atom ) *space ) ")"
 
 atom            = bareword / quoted-string
 
-bareword        = letter *( letter / digit / "." / "-" / "_" )
+bareword        = ( letter / "_" ) *( letter / digit / "." / "-" / "_" )
 
 quoted-string   = quote *( quoted-char / bslash ( bslash / quote ) ) quote
 
@@ -67,7 +66,7 @@ space   = %x20 / %x09-0D    ; ASCII characters which are accepted by isspace() u
 
 Furthermore, the `<quoted-char>` element accepts all byte strings which encode exactly one Unicode character that is not in ASCII.
 
-An **s-expression** is a parenthesis-delimited sequence of atoms or other s-expressions.
+An **s-expression** is a parenthesis-delimited sequence of atoms or other s-expressions, which are referred to as the s-expression's **elements**.
 Whitespace (sequences of `<space>`) between the parentheses and atoms is ignored.
 For example, the following three s-expressions are equivalent.
 
@@ -79,7 +78,8 @@ For example, the following three s-expressions are equivalent.
 (foo   bar   )
 ```
 
-The **length** of an s-expression is the number of atoms or other s-expressions that it contains, without counting atoms or s-expressions inside the contained s-expressions.
+The **length** of an s-expression is the number of elements that it contains.
+Any element that is an s-expression itself counts as one element regardless of how many elements it contains.
 For example, the length of the s-expression `(a (b c) d)` is 3.
 The shortest s-expression is the empty s-expression, `()`, with length 0.
 
@@ -109,24 +109,112 @@ For each string of Unicode characters, there exists exactly one quoted string th
 
 ### 2.2. Message format
 
+```abnf
+module-name   = ( letter / "_" ) *( letter / "." / "-" / "_" ) digit
+
+function-name = bareword
+
+message-type  = "want" / "have" / ( module-name "." function-name )
+
+message       = "(" *space message-type *space *( ( s-expression / atom ) *space ) ")"
+```
+
+A **VT6 message** (or just **message**, if the term is not ambiguous) is a nonempty s-expression whose first element is an atom that is accepted by `<message-type>`.
+The first element of a message is therefore called the message's **type**.
+Any following elements of a message are called the message's **arguments**.
+A message may have arbitrarily many arguments, including zero arguments.
+As can be seen in the grammar definition above, a message type consists of a module name (see section TODO) and a function name, separated by a dot.
+As an exception, the function names "want" and "have" are message types without a module name (see section TODO).
+
+```abnf
+message-stream = *( *space message ) *space
+```
+
+A **VT6 message stream** (or just **message stream**, if the term is not ambiguous) is a sequence of VT6 messages which are optionally preceded, succeeded and/or separated by whitespace.
+
+### 2.3. Server-client communication
+
+When a VT6 client is running in normal mode, it sends messages to its server by writing a message stream onto the message output, and receives messages from the server by reading a message stream from the message input.
+Furthermore, it can read input data from standard input and write output data to standard output.
+This specification does not restrict the form of these input and output data.
+
+TODO: define behavior and semantics of multiplexed mode (need some sort of escape sequence for `\x1B{`)
+
+### 2.4. Invalid messages, and handling thereof
+
+A message is **invalid** if:
+
+- the message is not accepted by `<s-expression>`,
+
+- the message's first element is not an atom accepted by `<message-type>`,
+
+- the message's arguments do not conform to the requirements for the message's type, as stated in the specification defining the message type in question,
+
+- the size of the bytestring encoding the message exceeds the recipient's maximum message size (see section TODO), usually 4096 bytes, or
+
+- the message type is unknown or its use has not been negotiated with the recipient (see section TODO).
+
+A VT6 server receiving an invalid message from a VT6 client MUST act towards the client as if the message had never been received at all, and vice versa for messages from the server to the client.
+
+A VT6 client or server MAY continue parsing and acting on a partially received message only if it is able to rollback all actions performed because of this message if the message turns out to be invalid once fully received, or if the connection is lost before the message is fully received.
+This only concerns actions that are performed towards the sender of the message.
+For example, the action of a server reporting a malformed client message to the user is not restricted by this rule, since the action is towards the user rather than the VT6 client.
+
+If, while parsing a message stream, a message in the stream exceeds the recipient's maximum message size, the recipient SHOULD employ the following algorithm to reset the stream parser and find the next well-formed message.
+
+1. Discard all input characters until a `(` character is found, without keeping track of whether the `(` is inside a quoted string or not.
+2. Try to parse a message starting from this character.
+3. If no valid message could be read, go back to step 1.
+
+*Rationale:* The basic idea is pretty obvious.
+We explicitly recommend to ignore quotes when trying to fast-forward to the start of the next message, because, given the simple syntax of s-expressions, the most likely syntax error is malformed quoted strings because of unescaped quotes or backslashes.
+
+## 3. Modules
+
+TODO describe versioning
+
+### 3.1. Capability discovery
+
+TODO describe "want" and "have" message types
+
+## 4. Properties
+
+TODO define only the basic notion of properties here
+
+## 5. Message types for `vt6/core0`
+
+### 5.1. The `core0.sub` message
+
+TODO
+
+### 5.2. The `core0.pub` message
+
+TODO
+
+### 5.3. The `core0.set` message
+
+TODO
+
+## 6. Properties for `vt6/core0`
+
+### 6.1. The `core0.server-max-message-bytes` property
+
+TODO
+
+### 6.2. The `core0.client-max-message-bytes` property
+
+TODO
+
 <!--
 
 TODO: define message format based on s-expressions; example message exchange ("->" is client-to-server, "<-" vice versa):
 
    ->    (want core1 ui2 cli1)
    <-    (have core1.3 ui2.5)
-   ->    (core1.subscribe ui2.width ui2.height)
-   <-    (core1.notify ui2.width 80 ui2.height 25)
+   ->    (core1.sub ui2.width ui2.height)
+   <-    (core1.pub ui2.width 80 ui2.height 25)
 
 NOTE: no need for multiplexing of messages onto standard in/out, or text onto message in/out, unless in multiplexed mode
-
-TODO: define maximum message size, and re-synchronization algorithm as follows:
-
-   1. discard until next "("
-   2. try to parse as message
-   3. if invalid or unknown message, back to step 1
-
-TODO: define "want", "have" messages (the only ones that are unversioned and not bound to a module)
 
 NOTE: Not for this module, but: Syntax highlighting to be achieved by sending a "file type hint" message on message out.
 When multiple programs form a pipe, the latest file type hint (in pipe chronology) wins.
