@@ -87,3 +87,10 @@ main h4 {
   font-size: 1rem;
   line-height: 1.6rem;
 }
+
+main pre {
+  border: 1px dashed black;
+  padding: 0.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+}
