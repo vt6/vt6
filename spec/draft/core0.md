@@ -43,6 +43,72 @@ Therefore, VT6 clients MUST use the following method to determine whether a VT6 
 
 3. If the `VT6` environment variable is absent and the `TERM` environment variable does not contain the string `vt6`, the VT6 client MUST consider the VT6 server to be absent.
 
+## 2. Messages
+
+This section uses augmented Backus-Naur form (ABNF) as defined in [RFC5234](https://tools.ietf.org/html/rfc5234).
+
+### 2.1. S-expression format
+
+```abnf
+s-expression    = "(" *space 1*( ( s-expression / atom ) *space ) ")"
+
+atom            = bareword / quoted-string
+
+bareword        = letter *( letter / digit / "." / "-" / "_" )
+
+quoted-string   = quote *( quoted-char / bslash ( bslash / quote ) ) quote
+
+quote   = %x22              ; " (double quote)
+bslash  = %x5C              ; \ (backslash)
+digit   = %x30-39           ; decimal digits 0-9
+letter  = %x41-5A / %x61-7A ; letters A-Z and a-z
+space   = %x20 / %x09-0D    ; ASCII characters which are accepted by isspace() under the C locale
+```
+
+Furthermore, the `<quoted-char>` element accepts all byte strings which encode exactly one Unicode character that is not in ASCII.
+
+An **s-expression** is a parenthesis-delimited sequence of atoms or other s-expressions.
+Whitespace (sequences of `<space>`) between the parentheses and atoms is ignored.
+For example, the following three s-expressions are equivalent.
+
+```vt6
+(foo bar)
+
+(           foo bar)
+
+(foo   bar   )
+```
+
+The **length** of an s-expression is the number of atoms or other s-expressions that it contains, without counting atoms or s-expressions inside the contained s-expressions.
+For example, the length of the s-expression `(a (b c) d)` is 3.
+The shortest s-expression is the empty s-expression, `()`, with length 0.
+
+An **atom** is either a bareword or a quoted string.
+Each atom **represents** a string of Unicode characters.
+
+A **bareword** is a sequence of ASCII letters, digits, dots, dashes or underscores, such that the first character is a letter.
+A bareword **represents** itself.
+
+```
+bareword             valid
+example-bareword     valid
+example3.0           valid
+example bareword     invalid (contains whitespace)
+5example             invalid (does not start with letter)
+"bareword"           invalid (contains forbidden ASCII character)
+¯\_(ツ)_/¯           invalid (contains character not in ASCII)
+```
+
+A **quoted string** is a string of printable Unicode characters in the UTF-8 encoding, except for the double quote or backslash, enclosed by double quotes.
+The quoted string **represents** the string of characters between its enclosing quotes, except for escaping rules as noted below.
+For example, the quoted string `"abc"` represents the same 3-letter string as the bareword `abc`.
+
+A quoted string may represent a string containing double quotes or backslashes, if these characters are escaped by inserting a backslash before them.
+For example, the quoted string `"ab\\\"cd\""` represents the string `ab\"cd"`.
+For each string of Unicode characters, there exists exactly one quoted string that represents it.
+
+### 2.2. Message format
+
 <!--
 
 TODO: define message format based on s-expressions; example message exchange ("->" is client-to-server, "<-" vice versa):
