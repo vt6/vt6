@@ -187,7 +187,7 @@ Each module name, as accepted by the `<module-name>` grammar element defined abo
 This number is the **major version** of this module's specification.
 The module also has a second (positive integer) version number, which is called **minor version** and is not part of the module name.
 
-When a new module specification is created, its major and minor version number MUST be set to 0 and 1, respectively.
+When a new module specification is created, its major and minor version number MUST be set to 1 and 0, respectively.
 A module specification MUST clearly indicate its major and minor version number.
 The recommended way to do so is by including the following sentence near the start of the specification:
 
@@ -200,26 +200,25 @@ Herein, `<module-name>` is the module name including the major version number, a
 Everytime a new release of the module specification is made, its version number MUST be adjusted as follows:
 
 1. The minor version number is incremented.
-2. If the major version is greater than 0, and the module specification has been changed in a backwards-incompatible way compared to the previous release, the major version number is incremented and the minor version number is reset to 0.
-3. If the major version is 0, the major version MAY be incremented to 1 and the minor version reset to 0 if the module specification is considered stable by its authors.
+2. If the module specification has been changed in a backwards-incompatible way compared to the previous release, the major version number is incremented and the minor version number is reset to 0.
 
-This requirement does not apply when the release is only a prerelease that is not considered normative.
+This requirement does not apply when the release is only a prerelease that is not considered normative, and clearly labeled as such.
 
-The following changes to a module specification are considered **backwards-compatible** for the purpose of this algorithm:
+The following changes to a module specification are considered **backwards-compatible**:
 
 - definition of a new message type, property or capability
 - deprecation (but not removal) of an existing message type, property or capability
 - definition of previously undefined or underdefined behavior of an existing message type, property or capability
 - copyediting
 
-The following changes to a module specification are considered **backwards-incompatible** for the purpose of this algorithm:
+The following changes to a module specification are considered **backwards-incompatible**:
 
 - removal of a message type, property or capability
 - change of behavior of an existing message type, property or capability in such a way that there may exist programs that conform to the previous version of the specification, but not to the current one
 
 TODO These lists do not feel exhaustive. Double-check.
 
-**Rationale:** This follows the basic notion of [semantic versioning](http://semver.org/spec/v2.0.0.html), albeit massively simplified to suit the usecase of specifications.
+**Rationale:** This follows the basic notion of [semantic versioning](http://semver.org/spec/v2.0.0.html), albeit massively simplified to suit the usecase of module specifications.
 
 ### 3.1. Capability discovery
 
