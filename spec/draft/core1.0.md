@@ -1,8 +1,8 @@
-# `vt6/core0` - Fundamental protocols and interface contracts
+# `vt6/core1.0` - Fundamental protocols and interface contracts
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
-Refer to this document using the identifier `vt6/core0.1` or using its canonical URL, <https://vt6.io/std/draft/core0>.
+Refer to this document using the identifier `vt6/core1.0` or using its canonical URL, <https://vt6.io/std/draft/core1.0>.
 
 ## 1. Definitions and platform requirements
 
@@ -177,7 +177,7 @@ We explicitly recommend to ignore quotes when trying to fast-forward to the star
 ## 3. Modules
 
 The VT6 protocol specification is divided into **modules**, each of which has a **name**.
-For example, this document specifies the `core0` module.
+For example, this document specifies the `core1` module.
 
 Each module contains the message types (see section TODO), properties (see section TODO) and capabilities (see section TODO) defined in its specification.
 For each message type and property name defined in a module's specification, the part of the message type property name before the dot MUST be equivalent to the module name.
@@ -231,27 +231,27 @@ TODO define only the basic notion of properties here (note: MUST have an initial
 
 ## 5. Capabilities
 
-## 6. Message types for `vt6/core0`
+## 6. Message types for `vt6/core1`
 
-### 6.1. The `core0.sub` message
-
-TODO
-
-### 6.2. The `core0.pub` message
+### 6.1. The `core1.sub` message
 
 TODO
 
-### 6.3. The `core0.set` message
+### 6.2. The `core1.pub` message
 
 TODO
 
-## 7. Properties for `vt6/core0`
-
-### 7.1. The `core0.server-max-message-bytes` property
+### 6.3. The `core1.set` message
 
 TODO
 
-### 7.2. The `core0.client-max-message-bytes` property
+## 7. Properties for `vt6/core1`
+
+### 7.1. The `core1.server-max-message-bytes` property
+
+TODO
+
+### 7.2. The `core1.client-max-message-bytes` property
 
 TODO
 
