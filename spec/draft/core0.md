@@ -2,7 +2,7 @@
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
-Refer to this document using the identifier `vt6/core0` or using its canonical URL, <https://vt6.io/std/draft/core0>.
+Refer to this document using the identifier `vt6/core0.1` or using its canonical URL, <https://vt6.io/std/draft/core0>.
 
 ## 1. Definitions and platform requirements
 
@@ -60,6 +60,7 @@ quoted-string   = quote *( quoted-char / bslash ( bslash / quote ) ) quote
 quote   = %x22              ; " (double quote)
 bslash  = %x5C              ; \ (backslash)
 digit   = %x30-39           ; decimal digits 0-9
+nzdigit = %x31-39           ; non-zero decimal digits 1-9
 letter  = %x41-5A / %x61-7A ; letters A-Z and a-z
 space   = %x20 / %x09-0D    ; ASCII characters which are accepted by isspace() under the C locale
 ```
@@ -110,13 +111,15 @@ For each string of Unicode characters, there exists exactly one quoted string th
 ### 2.2. Message format
 
 ```abnf
-module-name   = ( letter / "_" ) *( letter / "." / "-" / "_" ) digit
+version-number =  "0" / ( nzdigit *digit )
 
-function-name = bareword
+module-name    = ( letter / "_" ) *( letter / "." / "-" / "_" ) version-number
 
-message-type  = "want" / "have" / ( module-name "." function-name )
+function-name  = bareword
 
-message       = "(" *space message-type *space *( ( s-expression / atom ) *space ) ")"
+message-type   = "want" / "have" / ( module-name "." function-name )
+
+message        = "(" *space message-type *space *( ( s-expression / atom ) *space ) ")"
 ```
 
 A **VT6 message** (or just **message**, if the term is not ambiguous) is a nonempty s-expression whose first element is an atom that is accepted by `<message-type>`.
@@ -132,6 +135,8 @@ message-stream = *( *space message ) *space
 
 A **VT6 message stream** (or just **message stream**, if the term is not ambiguous) is a sequence of VT6 messages which are optionally preceded, succeeded and/or separated by whitespace.
 
+**Rationale:** Allowing for whitespace between messages is especially useful when messages are emitted by a script in a language where a `print` operation appends a line separator by default.
+
 ### 2.3. Server-client communication
 
 When a VT6 client is running in normal mode, it sends messages to its server by writing a message stream onto the message output, and receives messages from the server by reading a message stream from the message input.
@@ -142,7 +147,7 @@ TODO: define behavior and semantics of multiplexed mode (need some sort of escap
 
 ### 2.4. Invalid messages, and handling thereof
 
-A message is **invalid** if:
+A message is **invalid** if...
 
 - the message is not accepted by `<s-expression>`,
 
@@ -171,7 +176,50 @@ We explicitly recommend to ignore quotes when trying to fast-forward to the star
 
 ## 3. Modules
 
-TODO describe versioning
+The VT6 protocol specification is divided into **modules**, each of which has a **name**.
+For example, this document specifies the `core0` module.
+
+Each module contains the message types (see section TODO), properties (see section TODO) and capabilities (see section TODO) defined in its specification.
+For each message type and property name defined in a module's specification, the part of the message type property name before the dot MUST be equivalent to the module name.
+For example, a module with a name of `example2` may define a `example2.foo` message type and an `example2.bar` property, but not an `example1.foo` message type or a `sample2.bar` property.
+
+Each module name, as accepted by the `<module-name>` grammar element defined above, has a trailing positive integer.
+This number is the **major version** of this module's specification.
+The module also has a second (positive integer) version number, which is called **minor version** and is not part of the module name.
+
+When a new module specification is created, its major and minor version number MUST be set to 0 and 1, respectively.
+A module specification MUST clearly indicate its major and minor version number.
+The recommended way to do so is by including the following sentence near the start of the specification:
+
+```
+Refer to this document using the identifier `vt6/<module-name>.<version-number>`.
+```
+
+Herein, `<module-name>` is the module name including the major version number, and `<version-number>` is the module specification's minor version number.
+
+Everytime a new release of the module specification is made, its version number MUST be adjusted as follows:
+
+1. The minor version number is incremented.
+2. If the major version is greater than 0, and the module specification has been changed in a backwards-incompatible way compared to the previous release, the major version number is incremented and the minor version number is reset to 0.
+3. If the major version is 0, the major version MAY be incremented to 1 and the minor version reset to 0 if the module specification is considered stable by its authors.
+
+This requirement does not apply when the release is only a prerelease that is not considered normative.
+
+The following changes to a module specification are considered **backwards-compatible** for the purpose of this algorithm:
+
+- definition of a new message type, property or capability
+- deprecation (but not removal) of an existing message type, property or capability
+- definition of previously undefined or underdefined behavior of an existing message type, property or capability
+- copyediting
+
+The following changes to a module specification are considered **backwards-incompatible** for the purpose of this algorithm:
+
+- removal of a message type, property or capability
+- change of behavior of an existing message type, property or capability in such a way that there may exist programs that conform to the previous version of the specification, but not to the current one
+
+TODO These lists do not feel exhaustive. Double-check.
+
+**Rationale:** This follows the basic notion of [semantic versioning](http://semver.org/spec/v2.0.0.html), albeit massively simplified to suit the usecase of specifications.
 
 ### 3.1. Capability discovery
 
@@ -179,29 +227,31 @@ TODO describe "want" and "have" message types
 
 ## 4. Properties
 
-TODO define only the basic notion of properties here
+TODO define only the basic notion of properties here (note: MUST have an initial value)
 
-## 5. Message types for `vt6/core0`
+## 5. Capabilities
 
-### 5.1. The `core0.sub` message
+## 6. Message types for `vt6/core0`
 
-TODO
-
-### 5.2. The `core0.pub` message
+### 6.1. The `core0.sub` message
 
 TODO
 
-### 5.3. The `core0.set` message
+### 6.2. The `core0.pub` message
 
 TODO
 
-## 6. Properties for `vt6/core0`
-
-### 6.1. The `core0.server-max-message-bytes` property
+### 6.3. The `core0.set` message
 
 TODO
 
-### 6.2. The `core0.client-max-message-bytes` property
+## 7. Properties for `vt6/core0`
+
+### 7.1. The `core0.server-max-message-bytes` property
+
+TODO
+
+### 7.2. The `core0.client-max-message-bytes` property
 
 TODO
 

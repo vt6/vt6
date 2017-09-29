@@ -70,6 +70,9 @@ main p, main ul, main ol {
     -webkit-hyphens: auto;
     text-align: justify;
 }
+main code {
+    white-space: nowrap;
+}
 
 main h1 {
   font-size: 1.8rem;
