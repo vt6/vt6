@@ -8,7 +8,7 @@
   {{ range .Data.Pages }}
     <li>
       <a href="{{.Permalink}}">{{.Title}} &mdash; {{.Description}}</a>
-      {{- if in (findRE "0$" .Title) "0" }} <em>(Draft)</em>{{ end -}}
+      {{- if in (findRE "/draft/" .Permalink) "/draft/" }} <em>(Draft)</em>{{ end -}}
     </li>
   {{ end }}
   </ul>

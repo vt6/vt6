@@ -1,5 +1,10 @@
 {{ partial "header" . }}
+{{ if in (findRE "/draft/" .Permalink) "/draft/" }}
+<div id="draft">Draft</div>
+<main class="draft">
+{{ else }}
 <main>
+{{ end }}
   {{ .Content }}
 </main>
 {{ partial "footer" . }}
