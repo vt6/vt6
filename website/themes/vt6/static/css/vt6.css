@@ -71,8 +71,8 @@ main p, main ul, main ol {
   -webkit-hyphens: auto;
   text-align: justify;
 }
-main code {
-  white-space: nowrap;
+main > :not(pre) code {
+  white-space: nowrap; /* do not break lines inside inline code, only in long snippets */
 }
 
 main h1 {
