@@ -1,5 +1,5 @@
 {{ partial "header" . }}
-{{ if in (findRE "/draft/" .Permalink) "/draft/" }}
+{{ if .Params.x_vt6_draft }}
 <div id="draft">Draft</div>
 <main class="draft">
 {{ else }}

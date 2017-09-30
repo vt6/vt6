@@ -4,12 +4,19 @@ use strict;
 use warnings;
 use v5.20;
 
+my $is_draft = 'false';
 chomp(my $first_line = <STDIN>);
+
+if ($first_line =~ /^\s*<!--\s*draft\s*-->\s*$/i) {
+  $is_draft = 'true';
+  chomp($first_line = <STDIN>);
+}
 
 if ($first_line =~ /^# `(.+?)` - (.+?)$/) {
   say "---";
   say "  title: '$1'";
   say "  description: '$2'";
+  say "  x_vt6_draft: $is_draft";
   say "---\n";
 } else {
   say {*STDERR} "first line of $ARGV[0] does not match expected format";
