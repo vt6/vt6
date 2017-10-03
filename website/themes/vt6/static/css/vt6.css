@@ -1,5 +1,5 @@
 html {
-  font-size: 18px; /* needs to be set here to establish the correct root-em */
+  font-size: 16px; /* needs to be set here to establish the correct root-em */
 }
 body {
   margin: 0;
@@ -97,6 +97,8 @@ main pre {
   padding: 0.5rem;
   max-width: 100%;
   overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.3rem;
 }
 
 #draft {
