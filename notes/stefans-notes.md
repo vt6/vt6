@@ -4,7 +4,6 @@
 
 * `core` module
   * Are the definitions in `core1.0` compatible with the notion of proxying that is going to be introduced in a subsequent module (maybe `mux1`)?
-  * We should consider allowing numbers everywhere in barewords. Quotes around number literals are cumbersome.
   * Properties right now are scoped to the module level. What about properties of objects? For instance, in the UI library, clients may define an arbitrary number of panels, which each have width/height.
 * job control module
   * Need to devise a method to establish a notion of pipe topology on the server, e.g. for the "file type hint" message that enables syntax highlighting, where the last file type hint in a pipe wins.
