@@ -1,4 +1,4 @@
-# `vt6/design` - Design overview
+# `vt6/why` - Manifesto
 
 This document is non-normative.
 For the formal definitions of basic VT6 terminology, please refer to [`vt6/core`](../core/).
