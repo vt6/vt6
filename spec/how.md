@@ -3,9 +3,20 @@
 This document is non-normative.
 For the formal definitions of basic VT6 terminology, please refer to [`vt6/core`](../core/).
 
-## 1. Basic workflow example
+## 1. Minimal setup
 
-This example describes the example of a usual workflow when using a VT6-capable terminal.
+```
++--------------+            +--------------+
+|               \____________\             |
+|   Terminal     \            \  Program   |
+|                /_ _ _ _ _ _ /            |
+|               /            /             |
++--------------+            +--------------+
+```
+
+## 2. Basic workflow example
+
+This example describes the usual workflow when using a VT6-capable terminal.
 This terminal acts as a VT6 server.
 When it starts up it typically calls a VT6 shell which acts as a VT6 client.
 From this shell several more VT6 clients and legacy clients might be started.
