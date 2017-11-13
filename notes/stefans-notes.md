@@ -9,6 +9,18 @@
 * job control module
   * Need to devise a method to establish a notion of pipe topology on the server, e.g. for the "file type hint" message that enables syntax highlighting, where the last file type hint in a pipe wins.
 
+* situation without frames
+  * There will be a message which some process (e.g., a shell) can send to exclusively receive all signals (until the next client sends the next such message). This is analogous to setting the foreground process group on a terminal device.
+  * If no client sends this message, the terminal handles signals in a platform-defined way. On POSIX, the terminal establishes a process group at startup with which it can dispatch signals to its child processes.
+* situation with frames
+  * Frame IDs are secrets; they should be sufficiently random and not guessable.
+  * Each client receives a `$VT6_FRAME` environment variable with the frame ID corresponding to its stdio.
+  * Shell uses `(make-frame <parent-frame-id>)` to create subframes; terminal answers with `(new-frame <frame-id>)`.
+  * Shell obtains stdio for this frame by making a new message FD, then sending `(io-for <frame-id>)<ESC>` (after the required `want/have` exchange).
+  * Shell launches subprocesses of pipeline with stdio for the pipeline's frame, setting `$VT6_FRAME` variable accordingly.
+  * When a frame is active, the terminal sends signals to the process which created the frame (i.e., to the same connection where `make-frame` was received).
+  * When a connection is closed, IOs for frames which were created through it are closed by the terminal.
+
 ## Learning resources
 
 * [The TTY demystified](http://www.linusakesson.net/programming/tty/)
