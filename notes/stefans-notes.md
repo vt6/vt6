@@ -5,7 +5,6 @@
 * `core` module
   * Are the definitions in `core1.0` compatible with the notion of proxying that is going to be introduced in a subsequent module (maybe `mux1`)?
   * Properties right now are scoped to the module level. What about properties of objects? For instance, in the UI library, clients may define an arbitrary number of panels, which each have width/height.
-  * Should include a message to indicate that the previous message was invalid. Not to report errors (we already established that it is futile to get broken clients back on track with error reporting), but to unblock a client waiting on its message input for a response. Should be valid in both directions (servers can be broken, too).
 * job control module
   * Need to devise a method to establish a notion of pipe topology on the server, e.g. for the "file type hint" message that enables syntax highlighting, where the last file type hint in a pipe wins.
 
