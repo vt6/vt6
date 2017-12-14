@@ -8,9 +8,6 @@
 * job control module
   * Need to devise a method to establish a notion of pipe topology on the server, e.g. for the "file type hint" message that enables syntax highlighting, where the last file type hint in a pipe wins.
 
-* situation without frames
-  * There will be a message which some process (e.g., a shell) can send to exclusively receive all signals (until the next client sends the next such message). This is analogous to setting the foreground process group on a terminal device.
-  * If no client sends this message, the terminal handles signals in a platform-defined way. On POSIX, the terminal establishes a process group at startup with which it can dispatch signals to its child processes.
 * situation with frames
   * Frame IDs are secrets; they should be sufficiently random and not guessable.
   * Each client receives a `$VT6_FRAME` environment variable with the frame ID corresponding to its stdio.
