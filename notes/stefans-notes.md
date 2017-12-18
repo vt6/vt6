@@ -21,6 +21,7 @@
 
 * [The TTY demystified](http://www.linusakesson.net/programming/tty/)
 * [Proper handling of SIGINT/SIGQUIT](https://www.cons.org/cracauer/sigint.html)
+* [Reference for control sequences recognized by xterm](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html)
 
 ## Prior art
 
