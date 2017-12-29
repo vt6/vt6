@@ -1,2 +1,6 @@
 website/public/
 website/content/**/*.md
+
+# artifacts from tools/tikz-to-svg.sh
+.tikz/
+spec/**/*.svg

@@ -10,29 +10,33 @@ body {
   font-kerning: normal;
 }
 
-header {
-  background: url(/img/logo-dark-plain.png);
+/******************** header ********************/
+
+header, nav {
   background-size: contain;
   margin-left: calc(50vw - 400px);
-  height: 96px;
   position: relative;
   z-index: 1;
 }
 @media(max-width: 800px) {
-  header {
+  header, nav {
     margin-left: 0;
   }
 }
-header::before {
+
+header::before, nav::before {
   position: absolute;
   top: 0;
   right: 100%;
   width: 100vw;
-  height: 96px;
   content: " ";
-  background: url(/img/logo-dark-plain.png);
   background-size: contain;
   background-position: right;
+}
+
+header, header::before {
+  height: 96px;
+  background-image: url(/static/logo-dark-plain.png);
 }
 
 header > h1 {
@@ -58,6 +62,48 @@ header > h1 > div > span {
   font-weight: normal;
 }
 
+/******************** navigation ********************/
+
+/* NOTE: Some behavior of nav and nav::before is shared with the header, see above. */
+
+nav, nav::before {
+  min-height: 2rem;
+  background-color: black;
+}
+
+nav {
+  line-height: 2rem;
+  padding: 0 0.5rem;
+}
+
+nav > ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  height: 1.5rem;
+  line-height: 1.5rem;
+}
+
+nav > ul > li {
+  display: inline-block;
+  height: 1.5rem;
+  padding: 0 0.3rem;
+}
+
+nav > ul > li > a {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+nav > ul.breadcrumb {
+  background: #222;
+  border-radius: 0.25rem;
+}
+
+
+/******************** content ********************/
+
 main {
   max-width: 800px;
   margin: 0 auto;
@@ -73,6 +119,11 @@ main p, main ul, main ol {
 }
 main > :not(pre) code {
   white-space: nowrap; /* do not break lines inside inline code, only in long snippets */
+}
+
+main > svg {
+  width: 100%;
+  height: auto;
 }
 
 main h1 {
@@ -100,6 +151,8 @@ main pre {
   font-size: 0.9rem;
   line-height: 1.3rem;
 }
+
+/******************** draft marker ********************/
 
 #draft {
   position: fixed;
