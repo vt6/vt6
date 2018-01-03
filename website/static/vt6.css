@@ -67,12 +67,12 @@ header > h1 > div > span {
 /* NOTE: Some behavior of nav and nav::before is shared with the header, see above. */
 
 nav, nav::before {
-  min-height: 2rem;
+  min-height: 2.5rem;
   background-color: black;
 }
 
 nav {
-  line-height: 2rem;
+  line-height: 2.5rem;
   padding: 0 0.5rem;
 }
 
