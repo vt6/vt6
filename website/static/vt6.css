@@ -121,6 +121,12 @@ main > :not(pre) code {
   white-space: nowrap; /* do not break lines inside inline code, only in long snippets */
 }
 
+main p.rationale {
+  border: 1px dashed #222;
+  background: #CCC;
+  padding: 0.5rem;
+}
+
 main > svg {
   width: 100%;
   height: auto;
