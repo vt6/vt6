@@ -31,6 +31,7 @@
       {{ range .DownwardsNavigation }}<li><a href="{{.URLPath}}">{{.Caption}}/</a></li>{{ end }}
     </ul>
   </nav>
+  {{ if .TableOfContentsHTML }}<aside>{{ .TableOfContentsHTML }}</aside>{{ end }}
   {{ if .IsDraft }}<div id="draft">Draft</div><main class="draft">{{ else }}<main>{{ end }}
     {{ .ContentHTML }}
   </main>

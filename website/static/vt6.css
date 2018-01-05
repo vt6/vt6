@@ -101,6 +101,64 @@ nav > ul.breadcrumb {
   border-radius: 0.25rem;
 }
 
+/******************** table of contents ********************/
+
+aside {
+  display: none;
+}
+
+@media(min-width: 1200px) {
+  aside {
+    display: block;
+    position: fixed;
+    top: calc(96px + 2.5rem); /* height of <header> + <nav> */
+    bottom: 0;
+    right: 0;
+    width: calc(50vw - 400px - 2.5rem);
+    padding: 1rem 0 0 0;
+  }
+
+  aside ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  aside ul ul {
+    font-size: 0.8rem;
+  }
+
+  aside li {
+    margin: 0;
+    padding: 0;
+  }
+
+  aside a {
+    display: inline-block;
+    color: black !important;
+    text-decoration: none !important;
+    padding-left: 0.5rem;
+    border-left: 3px solid transparent;
+  }
+
+  aside ul a {
+    padding-left: 0.5rem;
+  }
+  aside ul ul a {
+    padding-left: 1.5rem;
+  }
+  aside ul ul ul a {
+    padding-left: 2.5rem;
+  }
+  aside ul ul ul ul a {
+    padding-left: 3.5rem;
+  }
+
+  aside a.scrolled, aside a:hover, aside a:active, aside a:focus {
+    font-weight: bold;
+    border-left-color: black;
+  }
+}
 
 /******************** content ********************/
 
