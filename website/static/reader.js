@@ -1,8 +1,5 @@
 (function() {
-  var select = function(selector) {
-    nodeList = document.querySelectorAll(selector);
-    return Array.prototype.slice.call(nodeList, 0);
-  };
+  var tocOffsetTop = document.querySelector("aside").offsetTop;
 
   //when page is scrolled...
   var onscroll = function() {
@@ -30,6 +27,17 @@
         link.setAttribute("class", "");
       }
     });
+
+    //also, emulate "position:sticky" for the TOC container (cannot use
+    //"position:sticky" directly because element is absolutely rather than
+    //relatively positioned)
+    var aside = document.querySelector("aside");
+    if (window.pageYOffset > tocOffsetTop) {
+      aside.style.top = "0px";
+    } else {
+      aside.style.top = (tocOffsetTop - window.pageYOffset) + "px";
+    }
+    //TODO: disable this ^ on narrow screens, where <aside> is not placed as implied by this code
   };
 
   window.onscroll = onscroll;

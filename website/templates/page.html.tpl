@@ -31,9 +31,11 @@
       {{ range .DownwardsNavigation }}<li><a href="{{.URLPath}}">{{.Caption}}/</a></li>{{ end }}
     </ul>
   </nav>
-  {{ if .TableOfContentsHTML }}<aside>{{ .TableOfContentsHTML }}</aside>{{ end }}
-  {{ if .IsDraft }}<div id="draft">Draft</div><main class="draft">{{ else }}<main>{{ end }}
-    {{ .ContentHTML }}
-  </main>
+  <div class="white">
+    {{ if .TableOfContentsHTML }}<aside>{{ .TableOfContentsHTML }}</aside>{{ end }}
+    {{ if .IsDraft }}<div id="draft">Draft</div><main class="draft">{{ else }}<main>{{ end }}
+      {{ .ContentHTML }}
+    </main>
+  </div>
   <script type="text/javascript" src="/static/reader.js"></script>
 </body></html>
