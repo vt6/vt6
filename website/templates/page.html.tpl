@@ -35,4 +35,5 @@
   {{ if .IsDraft }}<div id="draft">Draft</div><main class="draft">{{ else }}<main>{{ end }}
     {{ .ContentHTML }}
   </main>
+  <script type="text/javascript" src="/static/reader.js"></script>
 </body></html>
