@@ -1,6 +1,2 @@
-website/public/
-website/content/**/*.md
-
-# artifacts from tools/tikz-to-svg.sh
-.tikz/
-spec/**/*.svg
+# produced by vt6-website-build(1)
+output/

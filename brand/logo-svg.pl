@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use v5.20;
 
-die "usage: $0 [dark|light] [square|plain|wide]" if @ARGV != 2 or $ARGV[0] !~ /^(?:dark|light)$/ or $ARGV[1] !~ /^(?:square|plain|wide)$/;
+die "usage: $0 [square|plain|wide]" if @ARGV != 1 or $ARGV[0] !~ /^(?:square|plain|wide)$/;
 
-my @pattern = $ARGV[1] eq 'square' ? (
+my @pattern = $ARGV[0] eq 'square' ? (
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
@@ -23,7 +23,7 @@ my @pattern = $ARGV[1] eq 'square' ? (
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
-) : $ARGV[1] eq 'plain' ? (
+) : $ARGV[0] eq 'plain' ? (
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
@@ -59,28 +59,15 @@ my @pattern = $ARGV[1] eq 'square' ? (
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,],
 );
 
-my @colors;
-if ($ARGV[0] eq 'dark') {
-  @colors = (
-    # background
-    '#111111',
-    # mute foreground
-    '#222222',
-    # actual foreground
-    '#FFFFFF',
-    '#00FF00',
-  );
-} else {
-  @colors = (
-    # background
-    '#F0F0F0',
-    # mute foreground
-    '#E0E0E0',
-    # actual foreground
-    '#000000',
-    '#009900',
-  );
-}
+my @colors = (
+  # background (#000)
+  '0 0 0 ',
+  # mute foreground (#333)
+  '51 51 51 ',
+  # actual foreground (#FFF and #0F0)
+  '255 255 255 ',
+  '0 255 0 ',
+);
 
 my $step = 16;
 my $size = 10;
@@ -88,6 +75,24 @@ my $size = 10;
 my $offset      = int(($step - $size) / 2);
 my $full_width  = scalar(@{$pattern[0]}) * $step;
 my $full_height = scalar(@pattern) * $step;
+
+say "P3 $full_width $full_height 255\n";
+
+for my $p_row (@pattern) {
+  for my $row (0..($step - 1)) {
+    if ($row < $offset or $row >= $offset + $size) {
+      say $colors[0] x $full_width;
+    }
+    else {
+      for my $pixel (@$p_row) {
+        print $colors[0] x $offset . $colors[$pixel] x $size . $colors[0] x $offset;
+      }
+      print "\n";
+    }
+  }
+}
+
+=for comment
 
 say '<?xml version="1.0" standalone="no"?>';
 say '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
@@ -103,3 +108,5 @@ for my $ix (0..$#{$pattern[0]}) { for my $iy (0..$#pattern) {
 }}
 
 say '</svg>';
+
+=cut

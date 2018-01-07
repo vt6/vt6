@@ -36,7 +36,7 @@ header::before, nav::before {
 
 header, header::before {
   height: 96px;
-  background-image: url(/static/logo-dark-plain.png);
+  background-image: url(/static/logo-plain.png);
 }
 
 header > h1 {
@@ -97,7 +97,7 @@ nav > ul > li > a {
 }
 
 nav > ul.breadcrumb {
-  background: #222;
+  background: #333;
   border-radius: 0.25rem;
 }
 

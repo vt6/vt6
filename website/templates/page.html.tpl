@@ -18,7 +18,7 @@
 <body class="{{if .IsDraft}}draft {{end}}">
   <header>
     <h1>
-      <a href="/"><img alt="VT6" src="/static/logo-dark-wide.png" /></a><div><span>A modern protocol for virtual terminals</span></div>
+      <a href="/"><img alt="VT6" src="/static/logo-wide.png" /></a><div><span>A modern protocol for virtual terminals</span></div>
     </h1>
   </header>
   <nav>
