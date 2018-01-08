@@ -4,4 +4,4 @@ The way that text terminals work on UNIX and operating systems derived from it h
 
 The **VT6 project**, though still in its earliest stages, is working towards a modern protocol for virtual terminals, which, among other things, runs almost entirely in userspace and provides a modular basis on which to serve both legacy clients and forward-looking terminals that want to provide modern capabilities to applications.
 
-Development is taking place on [GitHub](https://github.com/vt6/vt6).
+Development is taking place on [GitHub](https://github.com/vt6/vt6). Specifications and documentation regarding the specifications can be found in the [`std/` subtree](/std/).

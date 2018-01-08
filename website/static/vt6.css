@@ -185,7 +185,7 @@ main p.rationale {
   padding: 0.5rem;
 }
 
-main > svg {
+main > img.svg {
   width: 100%;
   height: auto;
 }
