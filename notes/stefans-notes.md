@@ -31,6 +31,18 @@
   "Content-Type" on stdin/stdout. I would like these very very much, but I don't see how to do this in a
   backwards-compatible way. [Here's the author explaining why the project failed, BTW.](https://www.reddit.com/r/programming/comments/137kd9/18_months_ago_termkit_a_nextgeneration_terminal/)
 
+* [notty](https://github.com/withoutboats/notty)
+
+* attempts to move the VT subsystem of Linux to userspace
+  * kmscon (2012, by David Herrmann)
+  * zhcon: http://zhcon.sourceforge.net/
+  * jfbterm: http://jfbterm.sourceforge.jp/
+  * fbterm: https://code.google.com/p/fbterm/
+  * yaft: https://github.com/uobikiemukot/yaft
+  * fbpad: http://repo.or.cz/w/fbpad.git
+  * see also: https://unix.stackexchange.com/questions/20458/how-to-use-dev-fb0-as-a-console-from-userspace-or-output-text-to-it/177209#177209
+  * see also: https://unix.stackexchange.com/questions/289849/what-type-of-terminal-to-support-if-implementing-a-terminal-emulator/289871#289871
+
 ## Known requirements that are not yet accounted for
 
 Clients need to...
