@@ -8,8 +8,9 @@ standardized modules and capabilities.
 The documents in this section are non-normative and may occasionally be
 extended and updated.
 
-* [`design`](./spec/design.md) describes the basic motivations and design
-  directions of VT6.
+* [`why`](./spec/why.md) describes the basic motivation and the guiding
+  principles of vt6.
+* [`how`](./spec/how.md) explains the overall design directions of vt6.
 
 ## Core modules
 

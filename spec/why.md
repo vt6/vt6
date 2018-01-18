@@ -1,7 +1,7 @@
 # `vt6/why` - Manifesto
 
 This document is non-normative.
-For the formal definitions of basic VT6 terminology, please refer to [`vt6/core`](../core/).
+For the formal definitions of basic VT6 terminology, please refer to [`vt6/core`](core/).
 
 ## 1. Motivation
 
@@ -39,6 +39,6 @@ The following principles guide and inform the design of the VT6 protocols and th
 
 3. **Focus on semantics** - VT6 applications should prefer semantic over presentational markup (e.g. a file type annotation over syntax highlighting color codes), so that the VT6 server can choose a method of presentation that is appropriate for both the content and the target platform.
 
-4. **Platform independence** - The VT6 protocol tries to not rely on operating system specifics as much as possible (but consider the platform requirements noted in [`vt6/core0`](./draft/core0.md)).
+4. **Platform independence** - The VT6 protocol tries to not rely on operating system specifics as much as possible (but consider the platform requirements noted in [`vt6/core`](./core/)).
 
 5. **Ease of use** - VT6 commands should be human-readable, and the protocol should be as easy to emit and consume in all programming and scripting languages as long as the ease of use does not significantly impede performance or resource requirements.
