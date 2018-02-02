@@ -13,7 +13,7 @@ Sources:
 
 # General important properties of a terminal
 
-- low latency
+- low latency (look at mosh)
 - 24-bit color
 - predictability
 - information density
@@ -29,6 +29,9 @@ For the output of a single command, offer to...
 
 - diff one frame with another one (i.e. text only in one frame is highlighted there; the shell could do this
   automatically when the same command is run twice in a row)
+- split window and pipe information between the subwindows
+
+- restore term title when going back to the prompt (is solved trivially by scoping termtitle to frame)
 
 # Text presentation
 
@@ -38,12 +41,18 @@ For the output of a single command, offer to...
 - make non-fixed-width fonts a first-class citizen
 - format text in the terminal (right-justifying text, centering, min/max-width, maybe tables)
 
+# Process handling
+
+- `sig1` should have a kill signal that cannot be caught
+
 # GUI
 
 - support autocompletion functionality of shells with a GUI dropdown component
 - PostScript support (like NeXTStep): specify fonts, show images, draw charts, etc.
   - "Frankly the future of terminals should look like Python Notebooks such as Jupyter."
 - apps (shells, editors) can query/set the window icon/title
+  - "A better display of my current working directory, and my current git branch. These items should be displayed at the
+    edge of the window, not inside the terminal itself."
 - image support: `cat` a picture and it's displayed, `ls` a directory of pictures and see thumbnails
   - more generally, file type detection and appropriate presentation for each output
 - metadata on output: `ls` a directory and click on a filename to open it
@@ -58,5 +67,7 @@ For the output of a single command, offer to...
   - ctrl+left-click on a path to `cd` into it or `xdg-open` it
   - this should be customizable (note to self: this is similar to plumber in acme(1))
 - split-screen/tabs/quake-mode support
+- support proper key events
+- mouse support during input (e.g. move cursor into the middle of a long command line)
 
-continue at "I'm a Mac User, and honestly..."
+continue at "I rarely use terminals..."
