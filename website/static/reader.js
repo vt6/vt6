@@ -18,13 +18,19 @@
     //...highlight that heading in the TOC
     var tocLinks = document.querySelectorAll("aside a");
     var expectedHref = "#" + currentHeadingID;
+    var tocOpenerCaption = "Table of contents";
     Array.prototype.forEach.call(tocLinks, function(link) {
       if (link.getAttribute("href") == expectedHref) {
         link.setAttribute("class", "scrolled");
+        tocOpenerCaption = link.innerText;
       } else {
         link.setAttribute("class", "");
       }
     });
+
+    //...mention the current heading in the TOC opener (only visible on mobile)
+    var tocOpener = document.querySelector("aside a#toc-open");
+    tocOpener.innerHTML = tocOpenerCaption;
   };
 
   window.onscroll = onscroll;

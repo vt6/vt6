@@ -16,7 +16,7 @@ header, nav {
   background-size: contain;
   margin-left: calc(50vw - 400px);
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 @media(max-width: 800px) {
   header, nav {
@@ -107,6 +107,64 @@ aside {
   display: none;
 }
 
+@media(max-width: 1199px) {
+  aside {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1; /* hide behind <header>, <nav> when scrolled to top */
+    background: white;
+    box-shadow: 0 0 5px black;
+  }
+  aside:not(:target) {
+    height: 3rem;
+  }
+  aside:target {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  aside:not(:target) ul {
+    display: none;
+  }
+
+  aside a#toc-open {
+    display: block;
+    width: 100%;
+    height: 100%;
+    font-size: 1.2rem;
+    line-height: 3rem;
+    padding: 0 0.5rem;
+    background: white;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  aside:target a#toc-open {
+    display: none;
+  }
+
+  aside a#toc-open:before {
+    content: "☰"; /* U+2630 character is used as hamburger menu symbol */
+    padding-right: 1rem;
+  }
+
+  /* when jumping to a heading from the TOC, the following ensures that the
+   * heading does not end up covered by the TOC opener (courtesy of
+   * https://stackoverflow.com/a/13184714) */
+  main h1:before, main h2:before, main h3:before, main h4:before, main h5:before, main h6:before {
+    content: ' ';
+    display: block;
+    position: relative;
+    width: 0;
+    height: 4rem;
+    margin-top: -4rem;
+  }
+}
+
 @media(min-width: 1200px) {
   /* for position:sticky to work correctly, <aside> (and, therefore, all its ancestors) need to extend to the bottom of the page */
   body {
@@ -129,49 +187,57 @@ aside {
 
   aside > ul {
     position: sticky;
+    -webkit-position: sticky;
     top: 1rem;
   }
 
-  aside ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+  /* TOC opener is not needed since TOC is always open */
+  a#toc-open {
+    display: none;
   }
+}
 
-  aside ul ul {
-    font-size: 0.8rem;
-  }
+aside ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
 
-  aside li {
-    margin: 0;
-    padding: 0;
-  }
+aside ul ul {
+  font-size: 0.8rem;
+}
 
-  aside a {
-    display: inline-block;
-    color: black !important;
-    text-decoration: none !important;
-    padding-left: 0.5rem;
-    border-left: 3px solid transparent;
-  }
+aside li {
+  margin: 0;
+  padding: 0;
+}
 
-  aside ul a {
-    padding-left: 0.5rem;
-  }
-  aside ul ul a {
-    padding-left: 1.5rem;
-  }
-  aside ul ul ul a {
-    padding-left: 2.5rem;
-  }
-  aside ul ul ul ul a {
-    padding-left: 3.5rem;
-  }
+aside a {
+  display: inline-block;
+  color: black !important;
+  text-decoration: none !important;
+}
 
-  aside a.scrolled, aside a:hover, aside a:active, aside a:focus {
-    font-weight: bold;
-    border-left-color: black;
-  }
+aside ul a {
+  padding-left: 0.5rem;
+  border-left: 3px solid transparent;
+}
+aside ul a.scrolled, aside ul a:hover, aside ul a:active, aside ul a:focus {
+  font-weight: bold;
+  border-left-color: black;
+}
+
+aside ul a {
+  padding-left: 0.5rem;
+}
+aside ul ul a {
+  padding-left: 1.5rem;
+}
+aside ul ul ul a {
+  padding-left: 2.5rem;
+}
+aside ul ul ul ul a {
+  padding-left: 3.5rem;
 }
 
 /******************** content ********************/

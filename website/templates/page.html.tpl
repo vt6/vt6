@@ -32,7 +32,12 @@
     </ul>
   </nav>
   <div class="white">
-    {{ if .TableOfContentsHTML }}<aside>{{ .TableOfContentsHTML }}</aside>{{ end }}
+    {{ if .TableOfContentsHTML }}
+      <aside id="toc">
+        {{ .TableOfContentsHTML }}
+        <a id="toc-open" href="#toc"></a>
+      </aside>
+    {{ end }}
     {{ if .IsDraft }}<div id="draft">Draft</div><main class="draft">{{ else }}<main>{{ end }}
       {{ .ContentHTML }}
     </main>
