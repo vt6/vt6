@@ -108,14 +108,28 @@ aside {
 }
 
 @media(min-width: 1200px) {
+  /* for position:sticky to work correctly, <aside> (and, therefore, all its ancestors) need to extend to the bottom of the page */
+  body {
+    height: 100%;
+  }
+  div.white {
+    position: relative;
+    height: calc(100% - 96px - 2.5rem);
+  }
+
   aside {
     display: block;
-    position: fixed;
-    top: calc(96px + 2.5rem); /* height of <header> + <nav> */
+    position: absolute;
+    top: 0;
     bottom: 0;
     right: 0;
     width: calc(50vw - 400px - 2.5rem);
-    padding: 1rem 0 0 0;
+    padding: 0;
+  }
+
+  aside > ul {
+    position: sticky;
+    top: 1rem;
   }
 
   aside ul {
