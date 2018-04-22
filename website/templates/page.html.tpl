@@ -35,7 +35,7 @@
     {{ if .TableOfContentsHTML }}
       <aside id="toc">
         {{ .TableOfContentsHTML }}
-        <a id="toc-open" href="#toc"></a>
+        <a id="toc-open" href="#toc">&#x2630; {{.Title}}</a>
       </aside>
     {{ end }}
     {{ if .IsDraft }}<div id="draft">Draft</div><main class="draft">{{ else }}<main>{{ end }}
