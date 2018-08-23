@@ -14,7 +14,7 @@ The navigation bar at the top of the screen shows all the modules that currently
 
 Every VT6 server (that is, every terminal, proxy, etc.) needs to implement at least two modules:
 
-* [vt6/core](core/) describes how clients connect to and exchange messages with their server. It formally defines fundamental concepts like modules, capabilities, message types and properties, and how their usage is negotiated between server and client, and it defines basic message types for interacting with properties.
+* [vt6/core](core/) describes how clients connect to and exchange messages with their server. It formally defines fundamental concepts like modules, message types and properties, and how their usage is negotiated between server and client, and it defines basic message types for interacting with properties.
 
 * [vt6/term](term/) provides a conceptual model for what a terminal is, how a client can influence it by writing to standard output and how the standard input of a client works.
 
