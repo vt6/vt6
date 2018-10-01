@@ -55,7 +55,7 @@ In the most common case (commands running inside a shell inside a terminal emula
 
 Every client has a standard input and output that connects to the terminal.
 Clients may also have one (or more) server connections to exchange VT6 messages with the server.
-Messages provide all the functionality that legacy terminals implement:
+Messages provide all the functionality that legacy terminals implement
 
 - via the [magic capabilities of terminal devices](https://linux.die.net/man/3/termios) provided by Unix kernels, or
 - using [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code).
@@ -95,7 +95,7 @@ When legacy clients need to be used with such a server, a wrapper may be used th
 \draw[dashed] ($(term.south east)+(-0.15,0)$) |- ($(wrap.west)+(0,-0.1)$);
 ```
 
-TODO link to an implementation of such a wrapper once there is one
+<!-- TODO link to an implementation of such a wrapper once there is one -->
 
 ### Enhancing insufficient servers
 
@@ -128,7 +128,7 @@ A **VT6 proxy** is a program that sits inbetween a client and a server, acting a
 When a server implementation does not implement all the modules that a client needs, the client can use a VT6 proxy to provide the missing features.
 For example, when a server is not able to display images on the terminal, a proxy may be used that converts the client's images into ASCII art.
 
-TODO link to and describe `6lint` (or however it will be called) once it exists
+<!-- TODO link to and describe `6lint` (or however it will be called) once it exists -->
 
 ### Connecting over the network
 
@@ -139,6 +139,39 @@ That server connection is then said to be operating in **multiplexed mode**, rat
 TODO figure out how this works exactly (who muxes, who demuxes? do we need to patch SSH?)
 
 TODO note to self: It appears sufficient if the terminal demuxes, although SSH on the source side may choose to demux. However, we need to adapt the protocol such that multiplexed mode starts at the first `\e[6V` (with everything before that being plain stdio), rather than requiring that `\e[6V` is the first thing on stdio, because SSH might show a password prompt or stuff like that before patching stdio through to the remote client.
+
+The final setup would look something like this:
+
+```tikz
+\usepackage{mathpazo}
+\usetikzlibrary{calc}
+\tikzset{>=stealth}
+\tikzstyle{prog}=[minimum width=1.9cm,rectangle,draw]
+---
+\draw[draw=none] (-5,0) rectangle (5,0); % explicit whitespace at the left/right
+
+\node[prog] (term)   at (-3,+0) { Terminal };
+\node[prog] (shell)  at (+0,+0) { Shell };
+\node[prog] (sshc)   at (+0,-1) { ssh client };
+\node[prog] (sshs)   at (-3,-3) { ssh server };
+\node[prog] (mux)    at (+0,-3) { Muxer };
+\node[prog] (shell2) at (+3,-3) { Shell };
+\node[prog] (prog)   at (+3,-4) { Program };
+
+% standard IO
+\draw ($(term.east)+(0,0.1)$) -- ($(shell.west)+(0,0.1)$);
+\draw ($(term.east)+(0.6,0.1)$) |- ($(sshc.west)+(0,0.1)$);
+\draw (sshc.south) -- node [midway,auto] { \scriptsize (TCP connection) } +(0,-1) -| (sshs.north);
+\draw (sshs.east) -- (mux.west);
+\draw ($(mux.east)+(0,0.1)$) -- ($(shell2.west)+(0,0.1)$);
+\draw ($(mux.east)+(0.6,0.1)$) |- ($(prog.west)+(0,0.1)$);
+
+% message IO
+\draw[dashed] ($(term.east)+(0,-0.1)$) -- ($(shell.west)+(0,-0.1)$);
+\draw[dashed] ($(term.south east)+(-0.15,0)$) |- ($(sshc.west)+(0,-0.1)$);
+\draw[dashed] ($(mux.east)+(0,-0.1)$) -- ($(shell2.west)+(0,-0.1)$);
+\draw[dashed] ($(mux.south east)+(-0.15,0)$) |- ($(prog.west)+(0,-0.1)$);
+```
 
 ## Modules
 
@@ -161,7 +194,8 @@ Each message type or property name is prefixed with the name of its module in th
 \draw [decorate,decoration={brace,amplitude=3pt}] (core.north west) -- (sub.north east) node [midway,auto,font=\tiny,yshift=+5pt] { message type };
 ```
 
-Modules are versioned with a pair of major and minor version number, following a simplified variant of [semantic versioning](https://semver.org).
+Modules use a a simplified variant of [semantic versioning](https://semver.org).
+A module version is a pair of major and minor version number.
 Minor versions can add new message types, properties or other behavior.
 All other changes to a module's specification are backwards-incompatible and must result in a new major version.
 
@@ -198,7 +232,8 @@ Each bytestring has the form `<count>:<bytes>,`, where `<count>` is the number o
 The list of bytestrings is followed by a `}` character, mostly as a visual aid.
 The first bytestring in a message is the **message type**, the remaining bytestrings are called the **arguments** of the message.
 
-This format is simple and extensible and can be generated and parsed without requiring additional memory allocations, but it's slightly hard to type by hand or parse with the naked eye.
+This format is based on [djb's netstrings](https://cr.yp.to/proto/netstrings.txt).
+It is simple and extensible and can be generated and parsed without requiring additional memory allocations, but it's slightly hard to type by hand or parse with the naked eye.
 For specifications and documentation, we therefore use an alternate representation for messages that looks like this:
 
 ```vt6
@@ -234,7 +269,7 @@ Alternatively, the server can reply with an empty `have` message to indicate tha
 When that happens, the client can either bail out or choose to work without that module, e.g. by reducing its feature set.
 
 Some modules may depend on other modules, meaning that the server must agree to the dependencies before it can agree to the module itself.
-Most clients will want to send a stream of `want` messages all at once when starting up to negotiate all the modules that they need to use or might want to use.
+Most clients will want to send a stream of `want` messages all at once when starting up to negotiate all the modules that they need or might want to use.
 
 ## Properties
 
@@ -253,7 +288,7 @@ The server will answer with a `core.pub` message containing the property's value
 Properties can also be set by the client using the `core.set` command.
 The server must always answer with another `core.pub`, even if it could not change the value because the property is read-only.
 Even for editable properties, the new property value indicated in `core.pub` may be different from what the client requested.
-For example, in the following conversation, the terminal cannot be resized beyond 250 characters width because of the constraints of the physical screen:
+For example, in the following conversation, the terminal cannot be resized beyond 200 characters width because of the constraints of the physical screen:
 
 ```vt6
 [client] (core.sub term.width)
