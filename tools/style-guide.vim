@@ -4,9 +4,9 @@
 set ft=markdown
 syn sync fromstart
 
-syn match vt6StyleErrorLineNotEndingWithDot +^\%(```\)\@![^#<-].*\%([.:]\**\)\@<!\n+
-syn match vt6StyleErrorSentenceEndWithinLine +^\%(```\)\@![^#<-][^1-9].\{-}[A-Za-z]\{2}\.\s+
-" Note: The phrase ^\%(```)\@![^#<-] skips lines that are not part of a paragraph (headings, code snippets, embedded HTML and lists).
+syn match vt6StyleErrorLineNotEndingWithDot +^\%(```\)\@![^#<1-9-].*\%([.:]\**\)\@<!\n+
+syn match vt6StyleErrorSentenceEndWithinLine +^\%(```\)\@![^#<1-9-][^1-9].\{-}[A-Za-z]\{2}\.\s+
+" Note: The phrase ^\%(```)\@![^#<1-9-] skips lines that are not part of a paragraph (headings, code snippets, embedded HTML, unordered and ordered lists).
 " Note: The character group [^1-9] ensures that the dot in an enumeration ("1.", "2.", etc.) is not considered for the match.
 " Note: [A-Za-z]{2} excludes abbreviations like "i.e." and "e.g.".
 "
