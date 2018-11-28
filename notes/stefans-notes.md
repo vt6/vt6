@@ -36,6 +36,8 @@
 
 * [notty](https://github.com/withoutboats/notty)
 
+* [aminal](https://github.com/liamg/aminal)
+
 * attempts to move the VT subsystem of Linux to userspace
   * kmscon (2012, by David Herrmann)
   * zhcon: http://zhcon.sourceforge.net/
