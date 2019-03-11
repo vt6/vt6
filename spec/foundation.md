@@ -18,7 +18,7 @@ The process can read text from **standard input (stdin)** and write text onto **
 We will refer to this set of streams as the **standard streams** of that process.
 
 While stderr is usually directly connected to the terminal, every process's stdin can be another process's stdout and vice versa.
-Processes running in the terminal therefore form a pipeline.
+Processes running in the terminal therefore form a pipeline:
 The terminal sends input text into the stdin of the first process in the pipeline.
 The stdout of one process in the pipeline is the next process's stdin.
 And finally, the last process's stdout gets sent to the terminal for display.
@@ -33,20 +33,21 @@ It also sets up new pipes to connect all children together, so that they form a 
 Some shells allow multiple such pipelines of child processes to be running in parallel.
 In this case, each pipeline of child processes started by the shell is usually called a **job**.
 For each job, the stdin of the first process in the job's pipeline is called the **job's stdin**, and the stdout of the last process in the job's pipeline is called the **job's stdout**.
-When multiple jobs are running below a shell, the shell's stdin is identical to all jobs' stdins, and the shell's stdout is identical to all jobs' stdouts.
+When multiple jobs are running below a shell, the shell's stdin is identical to all jobs' stdins, and the shell's stdout is identical to all jobs' stdouts, except where input/output redirection is configured.
 
 We will use the term **client** to refer to any process that is not a terminal and which is receiving text data from or sending text data to a terminal either directly, or indirectly through a pipeline as described above.
 
 ## 1.2. Producers, consumers, peers
 
 Throughout this document and other VT6 specifications, we will use the following terms to refer to processes inside such a pipeline:
-* A **producer** is a process that writes text onto its stdout, such that the next process in the pipeline receives that text on its stdin.
-* A **consumer** is a process that reads text from its stdin, which has been put there by the previous process in the pipeline.
-* A process's **peers** are those processes (if existing) that are directly connected to that process via one of the pipes that form the pipeline.
+
+- A **producer** is a process that writes text onto its stdout, such that the next process in the pipeline receives that text on its stdin.
+- A **consumer** is a process that reads text from its stdin, which has been put there by the previous process in the pipeline.
+- A process's **peers** are those processes (if existing) that are directly connected to that process via one of the pipes that form the pipeline.
   The peer that consumes the process's stdout is called its **consuming peer**.
   The peer that produces the process's stdin is called its **producing peer**.
-* Data that is travelling through the pipeline in the same direction as text through its constituent one-directional pipes, i.e. from producer to consumer, is said to **flow with the current**.
-* Data that travels in the opposite direction, i.e. from consumer to producer, is said to **flow against the current**.
+- Data that is travelling through the pipeline in the same direction as text through its constituent one-directional pipes, i.e. from producer to consumer, is said to **flow with the current**.
+- Data that travels in the opposite direction, i.e. from consumer to producer, is said to **flow against the current**.
 
 Note that a process has less than two peers in the following situations:
 
@@ -60,6 +61,10 @@ The terminal is usually a peer of the first and the last process in the pipeline
 - Unless output redirection is used, it consumes the stdout of the last process in the pipeline.
 
 The terminal is therefore also considered a consumer and a producer in the context of the above definitions.
+We will refer to these separate aspects of the terminal as:
+
+- the **producer side of the terminal** (where user input is taken in and passed to the stdin of the first process in the pipeline), and
+- the **consumer side of the terminal** (where the stdout of the last process in the pipeline, as well as all processes' stderr, is taken in and displayed to the user).
 
 ### 1.3. Message streams
 
@@ -75,7 +80,7 @@ Responses flow back in the opposite direction.
 Only the first process's msgin and the last process's msgout are connected directly to the terminal.
 
 *Rationale:* The first major iteration of the VT6 protocol had the terminal set up a socket to which clients can connect directly, thus avoiding the potentially expensive forwarding of messages through other clients in the same pipeline.
-When it became clear that events have to travel along the pipeline in order to establish an ordering between text data and events, we abandoned this server-client architecture in favor of the pipeline-shaped message streams.
+When it became clear that events (see section 2.2) have to travel along the pipeline in order to establish an ordering between text data and events, we abandoned this server-client architecture in favor of the pipeline-shaped message streams.
 The main reason for this is simplicity of the mental model: All types of messages (events, requests and responses) travel along a graph with the same topology.
 This also makes the behavior of proxies more consistent and predictable for users.
 Furthermore, this design simplifies the multiplexing of message streams and standard streams for clients that run on a different machine, such as with SSH.
@@ -87,20 +92,22 @@ This allows the shell to route messages from/to the children, while still receiv
 When a shell creates a pipeline consisting of multiple child processes, it SHALL set up message streams following the pipeline topology.
 The first child process's msgin and last child process's msgout SHALL be connected to the shell.
 Otherwise, each child process's msgout SHALL be connected directly to the next child process's msgin.
-No exceptions SHALL be made for processes that have their stdin or stdout redirected from or to a file.
+No exceptions SHALL be made for processes that have their stdin or stdout redirected from or to a file or other non-terminal device.
 
-*Rationale:* Processes with output redirection should still be able to talk to the terminal.
-For example, consider a decryption tool that receive the input ciphertext on stdin.
+*Rationale:* Processes with input/output redirection should still be able to talk to the terminal.
+For example, consider a decryption tool that receives the input ciphertext on stdin.
 Even when stdin is a regular file, msgin and msgout should be connected to the terminal, so that it can ask the terminal to display a password prompt to the user.
 
 Shells SHALL only launch a job without suitably-connected message streams if the job may outlive the terminal process.
-In this case, the job's stdin and the job's stdout SHALL not be connected to the terminal.
+In this case, the job's stdin and stdout SHALL NOT be connected to the terminal directly, nor indirectly through peers.
 
 *Rationale:* This rule accommodates long-running daemon processes that are launched by the shell, but are not bound by the lifetime of the terminal in which they're spawned.
 
 If a shell has at most one child process at a time, the shell MAY pass its own message streams to its child if the shell does not use its message streams for the runtime of the child, and the shell can guarantee that the child is VT6-enabled and handles the message streams correctly.
 
-*Rationale:* If the shell gave its message streams to a child that does not understand how to use them, it would break the message streams for all client processes in the same pipeline, and potentially all client processes in the entire terminal session.
+*Rationale:* This exception prevents us, for example, from unnecessarily constraining the design of applications that consist of multiple processes internally.
+In such an application, the initial process may want to hand control over its message streams to some internal helper process.
+The exception is not broader because if the shell gave its message streams to a child that does not understand how to use them, it would break the message streams for all client processes in the same pipeline, and potentially all client processes in the entire terminal session.
 
 ### 1.4. Proxies
 
@@ -119,6 +126,7 @@ To ensure that all guarantees of the VT6 protocol are upheld, proxies MUST confo
 
 *Rationale:* An input proxy near the start of the pipeline, or an output proxy near the end of the pipeline, changes how the terminal appears to the other processes in the pipeline.
 Proxies may be used as a shim or polyfill (to provide capabilities that the terminal lacks), to remap input events, to simulate missing module support in a terminal (by manipulating `want`/`have` messages), to simulate different property values, etc.
+Because of how messages are routed (see sections 3.2 and 3.3), when a proxy is located within a job launched by the shell, it can only affect how the terminal appears to processes within that job's pipeline.
 
 ## 2. Protocol concepts
 
@@ -131,10 +139,9 @@ identifier = ( letter / "_" ) *( letter / "-" / "_" )
 
 The VT6 protocol is divided into **modules**.
 Each module has a name which is accepted by `<identifier>`.
-For example, this document concerns the module `core`.
 When it is not clear from the context that a given identifier refers to a module name, the prefix `vt6/` may be prepended to it.
 
-A module is considered **official** if its specifications are developed in the same location as this specification.
+A module is considered **official** if its specifications are developed in the same repository as this specification.
 The name of any unofficial module MUST start with a leading underscore and SHOULD indicate the organization that is responsible for its specification.
 
 A module is considered **private** if it is intended to only be used between applications of a single vendor.
@@ -159,9 +166,9 @@ These criteria include at least:
 Each message type has one of three roles: Messages of a particular type can be either **events** or **requests** or **responses**.
 When a message is said to **be an event** (or a request or a response, respectively), it means that the message's type is one that has the role "event" (or "request" or "response", respectively) according to the specification defining the message type.
 
-Event messages MUST be sent over the standard streams and therefore always flow with the current.
+Event messages MUST be sent over the standard streams and therefore always flow with the current (see section 3.2).
 
-Request and response messages MUST be sent over the message streams.
+Request and response messages MUST be sent over the message streams (see section 3.3).
 Responses SHALL only be sent by the terminal (or a proxy, see section 1.4), in response to a request, and travel in the opposite direction as the original request.
 
 The specification for a request message type MUST note whether the request requires the terminal to send a response, and if so, which message type is expected as a response.
@@ -171,19 +178,19 @@ The specification for a request message type MUST note whether the request requi
 A **property** is a quantifiable aspect of either the producer side or the consumer side of the terminal.
 The respective side is said to **publish** that property.
 
-- For properties that are published by the producer side of the terminal (where user input is taken in and passed to the stdin of the first process in the pipeline), requests to read or write them flow against the current, and responses therefore flow with the current.
-- For properties that are published by the consumer side of the terminal (where the stdout of the last process in the pipeline, as well as all processes' stderr, is taken in and displayed to the user), requests to read or write them flow with the current, and responses therefore flow against the current.
+- For properties that are published by the producer side of the terminal, requests to read or write them flow against the current, and responses therefore flow with the current.
+- For properties that are published by the consumer side of the terminal, requests to read or write them flow with the current, and responses therefore flow against the current.
 
 *Rationale:* These directionalities ensure that proxies (see section 1.4) work as intended.
 
-Each concrete value of a property is represented as a byte string, but for any given property, not all byte strings may be valid values.
+Each concrete value of a property is represented as a byte string (see section 2.1), but for any given property, not all byte strings may be valid values.
 
 Each property is defined by its name and at least the following criteria:
 
 - the directionality (whether the property is published by the producer side or by the consumer side of the terminal),
 - the set of values that the property can have,
 - whether, and under which circumstances, a client may update the property's value,
-- how the behavior of the terminal is influenced by the value of this property.
+- how the behavior of the publishing side of the terminal is influenced by the value of this property.
 
 For each message type, there SHALL NOT be a property of the same name.
 
@@ -211,7 +218,7 @@ When referring to a module version in specifications and other documents, the re
 As an exception, although this current document is identified as `vt6/foundation` in its title, there is no module called `foundation` and this is not a module specification.
 This is because this specification contains the unversionable parts of the VT6 protocol.
 
-Each module specification MUST clearly indicate the module name and full version number, preferably by including the recommended module version identifier in the document title, like this document does.
+Each module specification MUST clearly indicate the module name and full version number, preferably by including the recommended module version identifier in the document title.
 
 When the first specification of a module is created, its full version number MUST be set to `1.0`.
 Everytime a new specification of that module is released, the module version MUST be adjusted as follows:
