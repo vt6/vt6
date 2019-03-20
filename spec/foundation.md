@@ -235,7 +235,7 @@ The following changes to a module specification are considered **backwards-compa
 - addition of a new message type or property
 - deprecation (but not removal) of an existing message type or property
 - definition of previously undefined or underdefined behavior of an existing message type or property
-- copyediting
+- copyediting of the specification
 
 Every other change to a module specification is considered **backwards-incompatible**, especially:
 
@@ -251,7 +251,7 @@ scoped-identifier = identifier major-version "." identifier
 message-type      = init / want / have / nope / scoped-identifier
 
 ; cannot use string literals here (e.g. want = "want")
-; because those are case-insensitive
+; because those are case-insensitive in ABNF
 init = %x69.6E.69.74
 want = %x77.61.6E.74
 have = %x68.61.76.65
@@ -300,8 +300,10 @@ Some types of request messages have side effects that are bound by the lifetime 
 This means that the effect of those requests end when the lifetime of the client ID ends.
 The details of what "end of effect" means are laid out in the specification defining the message type in question.
 
-Client IDs are not chosen by the terminal, but by clients.
-A client can choose a new client ID by appending an arbitary string to its own client ID, such that the new string is also a valid client ID.
+When a terminal launches client processes, it SHALL choose a client ID for each of them.
+
+When a shell launches client processes, it SHALL choose a client ID for each of them.
+A client chooses new client IDs by appending an arbitary string to its own client ID, such that the new string is also a valid client ID.
 The client's original client ID therefore is a prefix of all client IDs so generated.
 
 Newly chosen client IDs do not have to be announced to the terminal.
@@ -520,6 +522,7 @@ Receipt of an invalid message MUST NOT cause any effect (besides error responses
 As an exception, clients that are not terminals or proxies are allowed to forward messages of unknown types as they would forward valid messages.
 
 TODO This section may need a rework. What error scenarios do we want to cover? Do we really want to consider all of this "invalid"?
+TODO NOTE: Divide into "syntactically invalid" and "semantically invalid". Response to syntactically invalid is a link-local (nope) without args. Response to semantically invalid is a routed (nope $MSGTYPE) with one argument indicating the message type of the invalid message.
 
 ## 4. Version discovery
 
