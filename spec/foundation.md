@@ -228,7 +228,7 @@ Everytime a new specification of that module is released, the module version MUS
 
 This requirement does not apply when the release is only a draft or pre-release that is not considered normative, and clearly labeled as such.
 
-**Rationale:** This follows the basic notion of [semantic versioning](http://semver.org/spec/v2.0.0.html), albeit massively simplified to suit the usecase of module specifications.
+*Rationale:* This follows the basic notion of [semantic versioning](http://semver.org/spec/v2.0.0.html), albeit massively simplified to suit the usecase of module specifications.
 
 The following changes to a module specification are considered **backwards-compatible**:
 
@@ -244,7 +244,7 @@ Every other change to a module specification is considered **backwards-incompati
 
 Each module specification whose minor version number is bigger than 0 SHOULD indicate which parts of it have been added or changed compared to previous specifications of that module with the same major version number.
 
-**Rationale:** Implementors should not have to `diff` specification documents manually.
+*Rationale:* Implementors should not have to `diff` specification documents manually.
 
 ```abnf
 scoped-identifier = identifier major-version "." identifier
@@ -460,6 +460,7 @@ The client ID of the response message SHALL be identical to that of the request 
 
 If the message is a request and the specification defining its message type allows it, the terminal MAY produce multiple responses.
 In this case, the first response message MUST be sent immediately, and further responses may be sent at any point in time until the lifetime of the requester's client ID ends.
+All responses must be addressed to the same client ID that appeared in the original request.
 
 *Rationale:* This rule accommodates subscription mechanisms like `core1.sub` and `core1.pub`, where the client subscribes once and receives multiple publications asynchronously.
 
@@ -518,13 +519,9 @@ The rules in section 3.3 ensure that syntactically invalid messages are always d
 A message is **semantically invalid** if:
 
 - it was sent on the standard streams, but includes a client ID,
-
 - it was sent on the message streams, but does not include a client ID,
-
 - it was sent on the standard streams, but the message is not an event,
-
 - it was sent on the message streams, but the message is an event, or
-
 - the message's arguments do not conform with the requirements for the message's type, as stated in the specification defining the message type in question.
 
 Receipt of a semantically invalid message by a terminal (or a proxy acting as a terminal) MUST NOT cause any effect (besides error responses, see section 5.2) that can be observed by the sender.
