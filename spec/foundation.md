@@ -155,7 +155,7 @@ This includes, most prominently, message types (see section 2.2) and properties 
 ### 2.2. Message types
 
 A **message type** is a name for a kind of message (see section 3) that can be sent and received either on the message streams or the standard streams of a process.
-Each message type is defined by its name, its role (see below) and a set of criteria describing when a message of that type is to be considered valid by the recipient.
+Each message type is defined by its name, its role (see below) and a set of criteria describing when a message of that type is to be considered (semantically) valid by the recipient.
 These criteria include at least:
 
 - the directionality (whether the message flows with the current, against the current, or both),
@@ -264,7 +264,7 @@ Each message type or property name MUST be accepted by `<scoped-identifier>`, an
 For example, the module `example1.2` may define a message type named `example1.foo` and a property named `example1.bar`, but not a message type named `example2.foo` (major version mismatch) or a property named `sample1.bar` (module name mismatch).
 
 As an exception, this document defines several message types that are plain identifiers which do not belong to any module.
-Valid message types are all strings that are accepted by `<message-type>`.
+Syntactically valid message types are all strings that are accepted by `<message-type>`.
 
 ### 2.5. Platforms
 
@@ -358,7 +358,7 @@ A **VT6 message** (or just **message**, if the term is not ambiguous) is a bytes
 - the value of the first netstring after the pipe symbol is accepted by `<message-type>`, and
 - the entire message, including the surrounding braces, does not exceed a length of 1024 bytes.
 
-Furthermore, for messages accepted by `<message-with-client-id>`, the value of the netstring before the pipe symbol must be accepted by `<client-id>`.
+Furthermore, for messages accepted by `<message-with-client-id>`, the value of the netstring before the pipe symbol MUST be accepted by `<client-id>`.
 
 The first netstring after the pipe symbol is called the message's **type**.
 Any following netstrings are called the message's **arguments**.
@@ -366,8 +366,7 @@ A message may have arbitrarily many arguments, including zero arguments.
 
 *Rationale:* We avoid compactly-coded escape sequences like those specified by [ECMA-48](https://www.ecma-international.org/publications/files/ECMA-ST/ECMA-48,%202nd%20Edition,%20August%201979.pdf) aka ANSI&nbsp;X3.64 aka ISO/IEC&nbsp;6429 because of the risk that escape sequences specified by different modules collide with each other.
 We choose an adaptation of the netstring format because it can be implemented very easily, both on the generating and on the parsing side.
-We use different sigils for argument lists (the pipe symbol) and netstrings (the colon symbol), so that the syntax can later be expanded to allow for nested lists.
-The curly brackets that enclose messages serve as a sequence point where parsing can be resumed after a parsing error (see sections 2.3 and 2.4).
+The curly brackets that enclose messages serve as a sequence point where parsing can be restarted after a parsing error (see sections 2.3 and 2.4).
 The maximum size limit of 1024 bytes reduces implementation complexity for simple client processes that cannot perform (or do not want to perform) dynamic memory allocation.
 
 ```abnf
@@ -413,12 +412,14 @@ human-readable = (<a1b2> core.set example.title "hello \"world\"")
 
 #### 3.2.1. Standard input
 
-When a VT6 program reads from stdin, it MUST look for events, fenced messages without client IDs that are sent by its producing peer.
+When a VT6 client reads from stdin, it SHOULD look for events, fenced messages that are sent by its producing peer.
 
 Once it reads the byte sequence `<ESC>{` (decimal byte sequence 27, 123) from its stdin, it SHALL attempt to read an entire fenced message.
 If, upon further reading, the initial `<ESC>{` turns out not to start a syntactically valid fenced message, those bytes, as well as all bytes up to the next `<ESC>{` SHALL be treated as ordinary input data.
 If, however, a syntactically valid fenced message is read from stdin, it shall be processed as a single unit occurring within the input stream, rather than as a string of individual bytes.
 The bytes that make up the fenced message SHALL NOT be considered part of the input text.
+
+When a VT6 terminal (or an output proxy) reads a client's stdout, it MUST look for events in the same way as described above.
 
 Event messages have defined semantics, but only terminals (and proxies acting as terminals) MUST honor them.
 There are no set rules for what other VT6 programs can or cannot do with the events.
@@ -436,26 +437,33 @@ Events SHOULD appear on their own line, that is: They should, if possible, direc
 
 ### 3.3. Using the message streams
 
-Clients can send requests with the current by writing request messages onto message output, and against the current by writing request messages client ID onto message input.
+Clients can send requests with the current by writing request messages with client ID onto message output, and against the current by writing request messages with client ID onto message input.
 Requests initiated by clients in this way SHALL include the client's client ID (or, if the client uses multiple client IDs, one of those client IDs).
-Processes SHALL NOT write anything onto the message streams that is not a VT6 message with client ID.
+VT6 applications SHALL NOT write anything onto the message streams that is not a VT6 message with client ID.
 
 Whenever input becomes available on one of the message streams, processes SHALL read that input without undue delay.
-Input from one of the message streams that is not part of a valid VT6 message with client ID SHALL be discarded.
+Input from one of the message streams that is not part of a syntactically valid VT6 message with client ID SHALL be discarded.
 The reading process SHALL skip ahead to the next `{` character and attempt to read the next message from this point.
 
 #### 3.3.1. As a terminal or proxy
 
 When a terminal reads a message with client ID from the message streams:
 
-- If the message is a request, the terminal SHALL act upon the request and, if necessary, send the appropriate response back to the requester by writing a response message with client ID into the same message stream where the message was received.
-  The client ID of the response message SHALL be identical to that in the request message.
-- If the message is a response or an event, the terminal SHALL discard the message.
-- TODO: define behavior for invalid messages and unknown message types (this ties into the TODO in section 3.4)
+- If the message is a request, the terminal SHALL act upon the request and, if necessary, reply with the appropriate response message type.
+- If the message is a response or event, or if it is semantically invalid, the terminal SHALL reply with a `nope` message (see section 5.2).
+- If the message is of an unknown type, the terminal SHALL reply with a negative `have` message (see section 4.2).
 
-These rules also apply to input proxies reading messages from message output, and to output proxies reading messages from message input.
+In each case, the terminal SHALL reply by writing a response message with client ID into the same message stream where the message was received.
+The client ID of the response message SHALL be identical to that of the request message.
 
-*Rationale:* Events are delivered over the standard streams, and responses are only ever sent by the terminal, not received by it.
+*Rationale:* Events and responses always require a `nope` response because events are delivered over the standard streams, and responses are only ever sent by the terminal, not received by it.
+
+If the message is a request and the specification defining its message type allows it, the terminal MAY produce multiple responses.
+In this case, the first response message MUST be sent immediately, and further responses may be sent at any point in time until the lifetime of the requester's client ID ends.
+
+*Rationale:* This rule accommodates subscription mechanisms like `core1.sub` and `core1.pub`, where the client subscribes once and receives multiple publications asynchronously.
+
+All rules in this section also apply to input proxies reading messages from message output, and to output proxies reading messages from message input.
 
 #### 3.3.2. As a client
 
@@ -504,11 +512,10 @@ This can be used to simplify the message handling code in resource-constrained c
 
 ### 3.4. Invalid messages, and handling thereof
 
-A message is **invalid** if...
+A message is **syntactically invalid** if it does not conform to the definitions in section 3.1.
+The rules in section 3.3 ensure that syntactically invalid messages are always discarded as soon as possible.
 
-- it does not conform to the definitions in section 3.1,
-
-- the message's arguments do not conform with the requirements for the message's type, as stated in the specification defining the message type in question,
+A message is **semantically invalid** if:
 
 - it was sent on the standard streams, but includes a client ID,
 
@@ -516,17 +523,15 @@ A message is **invalid** if...
 
 - it was sent on the standard streams, but the message is not an event,
 
-- it was sent on the message streams, but the message is an event.
+- it was sent on the message streams, but the message is an event, or
 
-Receipt of an invalid message MUST NOT cause any effect (besides error responses, see section 5.2) that can be observed by the sender.
-As an exception, clients that are not terminals or proxies are allowed to forward messages of unknown types as they would forward valid messages.
+- the message's arguments do not conform with the requirements for the message's type, as stated in the specification defining the message type in question.
 
-TODO This section may need a rework. What error scenarios do we want to cover? Do we really want to consider all of this "invalid"?
-TODO NOTE: Divide into "syntactically invalid" and "semantically invalid". Response to syntactically invalid is a link-local (nope) without args. Response to semantically invalid is a routed (nope $MSGTYPE) with one argument indicating the message type of the invalid message.
+Receipt of a semantically invalid message by a terminal (or a proxy acting as a terminal) MUST NOT cause any effect (besides error responses, see section 5.2) that can be observed by the sender.
 
 ## 4. Version discovery
 
-Before using any message types or properties of a module, a client MAY check whether the module is supported by the terminal, by sending a `want` message and waiting for the `have` response.
+Before using any message types or properties of a module, a client MAY check whether the module is supported by the terminal, by sending a `want` message and observing the `have` response.
 Alternatively, the client can just send a request with a message type from a heretofore unused module.
 The terminal will respond with a negative `have` message if it does not support that module, or with a positive `have` message if it supports that module, but not any version that defines the message type that was used.
 
@@ -555,25 +560,26 @@ TODO Rules for how the client chooses the request's directionality?
 A terminal MUST send a `have` message in response to:
 
 - any syntactically valid `want` request, regardless of whether the module is supported, or
-- any request whose message type is not supported by (or unknown to) the terminal.
+- any request whose message type is not supported by (or unknown to) the terminal (see section 3.3.1).
 
 ```abnf
 negative-have-argument = identifier major-version
 positive-have-argument = identifier major-version "." minor-version
 ```
 
-If the terminal does not support any module version with the module name and major version stated in the `want` argument, the only argument of the `have` response SHALL be identical to:
-
-- the original `want` argument, as indicated in the `<negative-have-argument>` grammar element defined above, if the request was a `want` message, or
-- the part of the request message type before the dot, if the request used an unsupported message type.
-
-If a `want` message is being answered and the terminal supports the given module and major version, the only argument of the `have` response SHALL be formatted according to the `<positive-have-argument>` grammar element defined above.
+If a `want` message is being replied to and the terminal supports the given module and major version, the only argument of the `have` response SHALL be formatted according to the `<positive-have-argument>` grammar element defined above.
 The module name and major version SHALL be identical to the respective parts of the `want` argument, and the minor version SHALL indicate the highest module version of that module and major version supported by the terminal.
+
+If a `want` message is being replied to and the terminal does not support any module version with the same module name and major version as stated in the `want` argument, the only argument of the `have` response SHALL be identical to the original `want` argument, as indicated in the `<negative-have-argument>` grammar element defined above.
 
 For example, assuming that the original request was `(<clientid> want foo1)`:
 
 - The response `(<clientid> have foo1)` indicates that no 1.x version of the `foo` module is supported.
 - The response `(<clientid> have foo1.2)` indicates that versions 1.0, 1.1 and 1.2 of the `foo` module is supported.
+
+If a message of an unsupported type is being replied to, the only argument of the `have` response SHALL be identical to the part of the request message type before the dot.
+
+For example, if a terminal receives the message `(<clientid> foo3.bar qux 42)` and it does not support messages of the type `foo3.bar`, it SHALL reply with `(<clientid> have foo3)`.
 
 ## 5. Other eternal message types
 
@@ -587,6 +593,7 @@ All message types defined in this specification are called **eternal** because t
 
 When a client process starts up, the first message that it reads from its message input will be an `init` message.
 The process starting the client process SHALL arrange for `init` being the first message received by it on message input.
+When received in any other situation, `init` messages SHALL be considered semantically invalid.
 
 The first argument of the `init` message SHALL be a client ID, as accepted by `<client-id>`.
 The client SHALL use this client ID (or client IDs derived from it, see section 2.6) when sending requests.
@@ -603,9 +610,9 @@ The second argument of the `init` message SHALL be a series of flags, where each
 
 ### 5.2. The `nope` message
 
-TODO How should this look like? This ties into the TODO in section 3.4.
+- Role: response (to any request)
+- Directionality: any
+- Number of arguments: one
 
---------------------------------------------------------------------------------
-
-TODO How does unsolicited core.pub work? It's technically not a response.
-
+A terminal (or a proxy acting as a terminal) SHALL send a `nope` message in response to a semantically invalid request message (see section 3.3.1 and section 3.4).
+The only argument of the `nope` message SHALL be the message type of the original request message.
