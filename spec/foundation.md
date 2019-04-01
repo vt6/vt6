@@ -539,6 +539,7 @@ Receipt of a semantically invalid message by a terminal (or a proxy acting as a 
 ## 4. Version discovery
 
 Before using any message types or properties of a module, a client MAY check whether the module is supported by the terminal, by sending a `want` message and observing the `have` response.
+
 Alternatively, the client can just send a request with a message type from a heretofore unused module.
 The terminal will respond with a negative `have` message if it does not support that module, or with a positive `have` message if it supports that module, but not any version that defines the message type that was used.
 
@@ -556,7 +557,9 @@ want-argument = identifier major-version
 
 The first and only argument MUST be the module name including major version, as accepted by the `<want-argument>` element defined above.
 
-TODO Rules for how the client chooses the request's directionality?
+Note that, because of proxies, a client may observe different sets of supported modules depending on the directionality (with or against the current).
+When a client sends a `want` request to check for support for a given module, it SHOULD use the same directionality that it is going to use for the requests and events defined in that module.
+If it intends to send requests and events from that module in both directions, it SHOULD send `want` requests in both directions.
 
 ### 4.2. The `have` message
 
@@ -582,11 +585,17 @@ If a `want` message is being replied to and the terminal does not support any mo
 For example, assuming that the original request was `(<clientid> want foo1)`:
 
 - The response `(<clientid> have foo1)` indicates that no 1.x version of the `foo` module is supported.
-- The response `(<clientid> have foo1.2)` indicates that versions 1.0, 1.1 and 1.2 of the `foo` module is supported.
+- The response `(<clientid> have foo1.2)` indicates that versions 1.0, 1.1 and 1.2 of the `foo` module are supported.
 
-If a message of an unsupported type is being replied to, the only argument of the `have` response SHALL be identical to the part of the request message type before the dot.
+If a message of an unsupported type is being replied to, the only argument of the `have` response SHALL be identical to:
 
-For example, if a terminal receives the message `(<clientid> foo3.bar qux 42)` and it does not support messages of the type `foo3.bar`, it SHALL reply with `(<clientid> have foo3)`.
+- the part of the request message type before the dot, if the terminal does not support any module version with that same module name and major version, or otherwise,
+- the part of the request message type up to and including the dot, followed by the highest minor version of that module and major version that is supported by the terminal.
+
+For example, if a terminal receives the message `(<clientid> foo3.bar qux 42)`:
+
+- The response `(<clientid> have foo3)` indicates that no 3.x version of the `foo` module is supported.
+- The response `(<clientid> have foo3.1)` indicates that versions 3.0 and 3.1 of the `foo` module are supported, but none of them define the `foo3.bar` message type.
 
 ## 5. Other eternal message types
 
@@ -600,7 +609,7 @@ All message types defined in this specification are called **eternal** because t
 
 When a client process starts up, the first message that it reads from its message input will be an `init` message.
 The process starting the client process SHALL arrange for `init` being the first message received by it on message input.
-When received in any other situation, `init` messages SHALL be considered semantically invalid.
+When received in any other situation, `init` messages SHALL be discarded.
 
 The first argument of the `init` message SHALL be a client ID, as accepted by `<client-id>`.
 The client SHALL use this client ID (or client IDs derived from it, see section 2.6) when sending requests.
