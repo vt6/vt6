@@ -16,7 +16,10 @@
   * Shell launches subprocesses of pipeline with stdio for the pipeline's frame, setting `$VT6_FRAME` variable accordingly.
   * When a frame is active, the terminal sends signals to the process which created the frame (i.e., to the same connection where `make-frame` was received).
   * When a connection is closed, IOs for frames which were created through it are closed by the terminal.
-  
+
+  * Since proxies act like terminals, they must intercept frame creation requests and provide a "virtual frame" to the requester that is a frontend of the proxied frame of the actual terminal.
+  * We should do a `proxy` module for this, where proxies announce that they are a proxy to the terminal, and the terminal notifies them when they need to intercept a newly created FD.
+
 * food for thought
   * Legacy clients use `isatty()` to decide whether to print rich (e.g. colored) output, which is a fundamentally broken method. Instead of conveying to the client the type of device receiving their stdout, we should convey whether its stdout will be presented to the user. (e.g. in `rg pattern /large/directory | less`, rg should be able to know that its stdout will be presented to the user, even though stdout is not directly connected to the terminal).
 
