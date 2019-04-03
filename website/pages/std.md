@@ -17,6 +17,8 @@ Every VT6 terminal (or proxy) needs to implement at least two modules:
 
 * [vt6/core](core/) It contains the most basic parts of the VT6 protocol that can be versioned, such as basic property types and some message types for handling properties and lifetimes. The only thing more basic is [`vt6/foundation`](https://vt6.io/std/foundation/) which contains the unversionable parts of the VT6 protocol.
 
+* [vt6/term](term/) provides a conceptual model for what a terminal is, how a client can influence it by writing to standard output and how the standard input of a client works.
+
 Furthermore, every terminal must implement a platform integration module. A platform integration modules defines the platform-specific behavior that all other modules reference. The following platform integration modules exist as of now:
 
 * [vt6/posix](posix/) is for terminals and clients running on a POSIX-compliant operating system, such as Linux or any BSD.
