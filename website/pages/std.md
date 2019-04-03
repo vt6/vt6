@@ -3,20 +3,19 @@
 **This document is non-normative**.
 
 The VT6 protocol is structured into versioned **modules**.
-Before exchanging messages, servers and clients negotiate which VT6 modules, and versions thereof, they understand.
+Servers and clients negotiate which VT6 modules, and versions thereof, they understand.
 
 Through the module structure, VT6 can adapt to clients and servers with vastly different feature sets.
 Through the use of versioning, new capabilities can be added and old functionality can be deprecated without having to break interoperability with old implementations.
 
-The navigation bar at the top of the screen shows all the modules that currently exist. For each module, there is a overview page, such as https://vt6.io/std/core/, that explains the module, its core features and how it fits together with other modules. Below this path, you can find the normative specifications for each module version, such as https://vt6.io/std/core/1.0/.
+The navigation bar at the top of the screen shows all the modules that currently exist. `Foundation` is an exception, since it defines fundamental protocols and interface contracts, and is not a versioned module that can be negotiated.
+For each module, there is an overview page, such as https://vt6.io/std/core/, that explains the module, its core features and how it fits together with other modules. Below this path, you can find the normative specifications for each module version, such as https://vt6.io/std/core/1.0/.
 
 ## Foundation
 
 Every VT6 server (that is, every terminal, proxy, etc.) needs to implement at least two modules:
 
-* [vt6/core](core/) describes how clients connect to and exchange messages with their server. It formally defines fundamental concepts like modules, message types and properties, and how their usage is negotiated between server and client, and it defines basic message types for interacting with properties.
-
-* [vt6/term](term/) provides a conceptual model for what a terminal is, how a client can influence it by writing to standard output and how the standard input of a client works.
+* [vt6/core](core/) It contains the most basic parts of the VT6 protocol that can be versioned, such as basic property types and some message types for handling properties and lifetimes. The only thing more basic is [`vt6/foundation`](https://vt6.io/std/foundation/) which contains the unversionable parts of the VT6 protocol.
 
 Furthermore, every server must implement a platform integration module. A platform integration modules defines the platform-specific behavior that all other modules reference. The following platform integration modules exist as of now:
 
