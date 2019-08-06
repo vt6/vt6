@@ -37,7 +37,7 @@ When multiple jobs are running below a shell, the shell's stdin is identical to 
 
 We will use the term **client** to refer to any process that is not a terminal and which is receiving text data from or sending text data to a terminal either directly, or indirectly through a pipeline as described above.
 
-## 1.2. Producers, consumers, peers
+### 1.2. Producers, consumers, peers
 
 Throughout this document and other VT6 specifications, we will use the following terms to refer to processes inside such a pipeline:
 
