@@ -257,6 +257,9 @@ main p, main ul, main ol {
 }
 main > :not(pre) code {
   white-space: nowrap; /* do not break lines inside inline code, only in long snippets */
+  border: 1px dashed #AAA;
+  padding: 3px 0;
+  font-size: 0.85rem;
 }
 
 main p.rationale {
