@@ -400,13 +400,13 @@ For example:
 ```
 message without client ID:
 
-actual         = {3|8:core.set,13:example.title,13:hello "world",}
-human-readable = (core.set example.title "hello \"world\"")
+actual         = {3|9:core1.set,13:example.title,13:hello "world",}
+human-readable = (core1.set example.title "hello \"world\"")
 
 message with client ID:
 
-actual         = {4:a1b2,3|8:core.set,13:example.title,13:hello "world",}
-human-readable = (<a1b2> core.set example.title "hello \"world\"")
+actual         = {4:a1b2,3|9:core1.set,13:example.title,13:hello "world",}
+human-readable = (<a1b2> core1.set example.title "hello \"world\"")
 ```
 
 ### 3.2. Using the standard streams
