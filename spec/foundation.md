@@ -294,10 +294,11 @@ Request and response messages contain a **client ID**, as accepted by the `<clie
 
 When sending a response message, a terminal (or a proxy acting as one) SHALL specify the same client ID in the response that is noted in the request.
 The client ID is used by clients to recognize which messages are directed at them, and to decide where to route messages not intended for them (see section 3.3).
+The `init` message is used to indicate to a client which client IDs belong to it (see section 5.1).
 
 Client IDs are conceptually tied to process lifetimes.
 Some types of request messages have side effects that are bound by the lifetime of the client ID.
-This means that the effect of those requests end when the lifetime of the client ID ends.
+This means that the effect of these requests end when the lifetime of the client ID ends.
 The details of what "end of effect" means are laid out in the specification defining the message type in question.
 
 When a terminal launches client processes, it SHALL choose a client ID for each of them.
