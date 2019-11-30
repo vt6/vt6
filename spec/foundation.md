@@ -563,7 +563,7 @@ If it intends to send requests and events from that module in both directions, i
 
 ### 4.2. The `have` message
 
-- Role: response (answers `want`)
+- Role: response (answers `want`, may answer any other message sent as a request)
 - Directionality: any
 - Number of arguments: one
 
@@ -603,22 +603,22 @@ All message types defined in this specification are called **eternal** because t
 
 ### 5.1. The `init` message
 
-- Role: special
+- Role: special (with client ID)
 - Directionality: with the current
-- Number of arguments: two
+- Number of arguments: one
 
 When a client process starts up, the first message that it reads from its message input will be an `init` message.
 The process starting the client process SHALL arrange for `init` being the first message received by it on message input.
 When received in any other situation, `init` messages SHALL be discarded.
 
-The first argument of the `init` message SHALL be a client ID, as accepted by `<client-id>`.
+The `init` message SHALL have a client ID.
 The client SHALL use this client ID (or client IDs derived from it, see section 2.6) when sending requests.
 
 ```abnf
 init-flags = ( "i" / "I" ) ( "o" / "O" ) ( "e" / "E" )
 ```
 
-The second argument of the `init` message SHALL be a series of flags, where each flag is a single character:
+The only argument of the `init` message SHALL be a series of flags, where each flag is a single character:
 
 - The first character SHALL be "I" if the client's stdin is connected to a terminal either directly or indirectly, or "i" if it is connected to a file or other resource.
 - The second character SHALL be "O" if the client's stdout is connected to a terminal either directly or indirectly, or "o" if it is connected to a file or other resource.
@@ -626,7 +626,7 @@ The second argument of the `init` message SHALL be a series of flags, where each
 
 ### 5.2. The `nope` message
 
-- Role: response (to any request)
+- Role: response (may answer any request)
 - Directionality: any
 - Number of arguments: one
 
