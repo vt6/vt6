@@ -532,7 +532,7 @@ The rules in sections 3.2 and 3.3 ensure that syntactically invalid messages are
 A message is **semantically invalid** if:
 
 - it was sent on the standard streams, but the message is not an event,
-- it was sent on the message streams, but the message is an event, or
+- it was sent on the message streams, but the message is an event or it was sent in the wrong direction, or
 - the message's arguments do not conform with the requirements for the message's type, as stated in the specification defining the message type in question.
 
 Receipt of a semantically invalid message by a terminal (or a proxy acting as a terminal) MUST NOT cause any effect (besides error responses, see section 5.2) that can be observed by the sender.
