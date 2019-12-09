@@ -294,10 +294,11 @@ Request and response messages contain a **client ID**, as accepted by the `<clie
 
 When sending a response message, a terminal (or a proxy acting as one) SHALL specify the same client ID in the response that is noted in the request.
 The client ID is used by clients to recognize which messages are directed at them, and to decide where to route messages not intended for them (see section 3.3).
+The `init` message is used to indicate to a client which client IDs belong to it (see section 5.1).
 
 Client IDs are conceptually tied to process lifetimes.
 Some types of request messages have side effects that are bound by the lifetime of the client ID.
-This means that the effect of those requests end when the lifetime of the client ID ends.
+This means that the effect of these requests end when the lifetime of the client ID ends.
 The details of what "end of effect" means are laid out in the specification defining the message type in question.
 
 When a terminal launches client processes, it SHALL choose a client ID for each of them.
@@ -531,7 +532,7 @@ The rules in sections 3.2 and 3.3 ensure that syntactically invalid messages are
 A message is **semantically invalid** if:
 
 - it was sent on the standard streams, but the message is not an event,
-- it was sent on the message streams, but the message is an event, or
+- it was sent on the message streams, but the message is an event or it was sent in the wrong direction, or
 - the message's arguments do not conform with the requirements for the message's type, as stated in the specification defining the message type in question.
 
 Receipt of a semantically invalid message by a terminal (or a proxy acting as a terminal) MUST NOT cause any effect (besides error responses, see section 5.2) that can be observed by the sender.
@@ -563,7 +564,7 @@ If it intends to send requests and events from that module in both directions, i
 
 ### 4.2. The `have` message
 
-- Role: response (answers `want`)
+- Role: response (answers `want`, may answer any other message sent as a request)
 - Directionality: any
 - Number of arguments: one
 
@@ -603,22 +604,22 @@ All message types defined in this specification are called **eternal** because t
 
 ### 5.1. The `init` message
 
-- Role: special
+- Role: special (with client ID)
 - Directionality: with the current
-- Number of arguments: two
+- Number of arguments: one
 
 When a client process starts up, the first message that it reads from its message input will be an `init` message.
 The process starting the client process SHALL arrange for `init` being the first message received by it on message input.
 When received in any other situation, `init` messages SHALL be discarded.
 
-The first argument of the `init` message SHALL be a client ID, as accepted by `<client-id>`.
+The `init` message SHALL have a client ID.
 The client SHALL use this client ID (or client IDs derived from it, see section 2.6) when sending requests.
 
 ```abnf
 init-flags = ( "i" / "I" ) ( "o" / "O" ) ( "e" / "E" )
 ```
 
-The second argument of the `init` message SHALL be a series of flags, where each flag is a single character:
+The only argument of the `init` message SHALL be a series of flags, where each flag is a single character:
 
 - The first character SHALL be "I" if the client's stdin is connected to a terminal either directly or indirectly, or "i" if it is connected to a file or other resource.
 - The second character SHALL be "O" if the client's stdout is connected to a terminal either directly or indirectly, or "o" if it is connected to a file or other resource.
@@ -626,7 +627,7 @@ The second argument of the `init` message SHALL be a series of flags, where each
 
 ### 5.2. The `nope` message
 
-- Role: response (to any request)
+- Role: response (may answer any request)
 - Directionality: any
 - Number of arguments: one
 
