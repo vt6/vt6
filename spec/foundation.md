@@ -240,31 +240,37 @@ For each message stream, there is a **client ID**, as accepted by the `<client-i
 At any point in time, each message stream's client ID SHALL be unique within the set of message streams connected to the same terminal.
 Once a message stream is closed, its client ID MAY be reused for a message stream connected to the same terminal which is opened later on.
 
+A client ID is said to **include** another client ID if it is a prefix of the other client ID and not identical to it.
+A client ID is said to **be included in** another client ID if the other client ID includes it.
+
 Client IDs are conceptually tied to process lifetimes.
 Some types of request messages have side effects that are bound by the lifetime of the client ID.
 This means that the effect of those requests end when the message stream corresponding to that client ID is closed.
 The details of what "end of effect" means are laid out in the specification defining the message type in question.
 
-When a terminal launches client processes, it SHALL choose a client ID for each of them, such that none of the client IDs so chosen are prefixes of each other.
+When a terminal launches client processes, it SHALL choose a client ID for each of them, such that none of the client IDs so chosen include each other.
 
 When a shell launches client processes, it SHALL choose a client ID for each of them.
-A client chooses new client IDs by appending an arbitary string to its own client ID, such that the new string is also a valid client ID.
-The client's original client ID therefore is a prefix of all client IDs so generated.
+However, there need not be a separate process for each client ID.
+A client can also choose new client IDs for itself, to describe durations inside the lifetime of its main client ID.
 
+A client chooses new client IDs by appending an arbitary string to its own client ID, such that the new string is also a valid client ID.
+The client's original client ID therefore includes all client IDs so generated.
 Upon choosing a client ID, the client MUST make the terminal aware of the new client ID in a platform-specific way.
 
-Lifetimes of client IDs end when the terminal receives a corresponding request message, such as `core1.lifetime-end`.
-When the terminal observes the end of the lifetime of a client ID in this way, it SHALL close all open message streams where the client ID with the ended lifetime is identical to or a prefix of the message stream's client ID.
-Hence, the lifetime of each client ID is bound by the lifetime of all client IDs that are prefixes of it.
+*Rationale:* This is necessary because message streams are always associated with a client ID.
+The newly spanwed client will not be able to obtain a message stream if the terminal is not aware of its client ID.
+
+The lifetime of a client ID end when the terminal receives a corresponding request message, such as `core1.client-end`.
+When the terminal observes the end of the lifetime of a client ID in this way, it SHALL also consider the lifetimes of all client IDs that are included in this client ID to have ended.
+In other words, the lifetime of each client ID is bound by the lifetime of all client IDs that include it.
+When the lifetime of a client ID ends, the terminal SHALL close the message stream with this client ID, if there is one.
 
 *Rationale:* The lifetimes of client IDs form a hierarchy that resembles the hierarchy of programs running in the terminal.
 When a shell launches a job, it allocates client IDs for all client processes (with lifetimes bound by the lifetime of its own client ID), and announces the end of the lifetime of those client IDs when the job is done.
 The lifetime mechanic solves a design problem of the legacy terminal implementation in POSIX: When a process wishes to change attributes of the terminal (e.g. set the input mode from cooked to raw), it has to remember to reset the attributes when it's done with the terminal.
 If it doesn't (e.g. because of a crash), the terminal is left in a misconfigured state.
 By binding such operations to the lifetime of client IDs, the shell can reset the terminal into a known state when a child process crashes, by simply ending the lifetime of the crashed process's client ID.
-
-There need not be a separate process for each client ID.
-A client can also choose new client IDs for itself, to describe durations inside the lifetime of its main client ID.
 
 ## 3. Messages
 
