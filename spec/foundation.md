@@ -256,7 +256,7 @@ A client can also choose new client IDs for itself, to describe durations inside
 
 A client chooses new client IDs by appending an arbitary string to its own client ID, such that the new string is also a valid client ID.
 The client's original client ID therefore includes all client IDs so generated.
-Upon choosing a client ID, the client MUST make the terminal aware of the new client ID in a platform-specific way.
+Upon choosing a client ID, the client MUST make the terminal aware of the new client ID by sending an appropriate request message, such as `core1.client-make`.
 
 *Rationale:* This is necessary because message streams are always associated with a client ID.
 The newly spanwed client will not be able to obtain a message stream if the terminal is not aware of its client ID.
