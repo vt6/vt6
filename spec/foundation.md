@@ -41,7 +41,7 @@ We will use the term **client** to refer to any process that is not a terminal a
 
 On VT6-enabled terminals, the one-directional pipes of traditional pipelines are augmented with a two-directional structured message protocol that supersedes the [special capabilities of terminal devices defined, for example, by POSIX](https://linux.die.net/man/3/termios), as well as the traditional output markup using ANSI escape sequences.
 
-Clients running in a VT6-enabled terminal SHALL have access (or be able to get access) to a bidirectional stream, which is called that process's **message stream**, respectively.
+Clients running in a VT6-enabled terminal SHALL have access (or be able to get access) to a bidirectional byte stream, which is called that process's **message stream**, respectively.
 When the individual standard streams are referred to as stdin, stdout and stderr, respectively, this stream may be called **msgio**.
 Message streams allow clients to engage in request-response conversations with the terminal.
 
@@ -120,6 +120,8 @@ Each message type has one of four roles: Messages of a particular type can be ei
 When a message is said to **be an event** (or a request or a response or a special message, respectively), it means that the message's type is one that has the role "event" (or "request" or "response" or "special message", respectively) according to the specification defining the message type.
 
 Event messages MUST be sent over the standard streams (see section 3.2).
+
+*Rationale:* Events are used when a message must have a guaranteed ordering in relation to text appearing on stdio. Examples include the terminal signaling EOF to a client (in response to a user pressing Ctrl-D), or the client informing the terminal of the MIME type of some text appearing on stdout.
 
 Request and response messages MUST be sent over the message stream (see section 3.3).
 Requests SHALL only be sent by a client.
@@ -259,7 +261,7 @@ The client's original client ID therefore includes all client IDs so generated.
 Upon choosing a client ID, the client MUST make the terminal aware of the new client ID by sending an appropriate request message, such as `core1.client-make`.
 
 *Rationale:* This is necessary because message streams are always associated with a client ID.
-The newly spanwed client will not be able to obtain a message stream if the terminal is not aware of its client ID.
+The newly spawned client will not be able to obtain a message stream if the terminal is not aware of its client ID.
 
 The lifetime of a client ID end when the terminal receives a corresponding request message, such as `core1.client-end`.
 When the terminal observes the end of the lifetime of a client ID in this way, it SHALL also consider the lifetimes of all client IDs that are included in this client ID to have ended.
@@ -386,7 +388,7 @@ Clients send requests to the terminal by writing request messages onto their mes
 Terminals respond by writing response messages onto the same message stream.
 
 Whenever input becomes available on a message stream, processes SHALL read that input without unreasonable delay.
-Input from one of the message stream that is not part of a syntactically valid VT6 message SHALL be discarded.
+Input from a message stream that is not part of a syntactically valid VT6 message SHALL be discarded.
 The reading process SHALL skip ahead to the next `{` character and attempt to read the next message from this point.
 
 #### 3.3.1. As a client
@@ -396,25 +398,27 @@ Clients SHALL NOT write anything other than request messages into their message 
 When a client reads a message from its message stream:
 
 - If the message is a response to a request made by the client, the client can consume the response.
-- If the message is a request or an event or an unexpected response, the message SHALL be discarded.
+- If the message is a special message that arrives in accordance with the rules for that message type, the client SHALL act upon the message as defined in the specification for that message type.
+- Otherwise, the message SHALL be discarded.
 
 #### 3.3.2. As a terminal
 
 When a terminal reads a message from the message stream:
 
 - If the message is a request and semantically valid, the terminal SHALL act upon the request and, if necessary, reply with the appropriate response message type.
+- If the message is a special message that arrives in accordance with the rules for that message type, the terminal SHALL act upon the message as defined in the specification for that message type.
 - If the message is a response or event, or if it is semantically invalid, the terminal SHALL reply with a `nope` message (see section 5.1).
 - If the message is of an unknown type, the terminal SHALL inspect the part of the message type before the dot, and reply with a `have` message (see section 4.2) describing the available support for the module and major version named therein.
 
-In each case, the terminal SHALL reply by writing the response as a message onto the same message stream where the original request was received.
-Terminals SHALL NOT write anything other than response messages into any message stream.
+In each case that requires a reply, the terminal SHALL reply by writing the response as a message onto the same message stream where the original request was received.
+Terminals SHALL NOT write anything other than response messages or special messages into any message stream.
 
 *Rationale:* Events and responses always require a `nope` response because events are delivered over the standard streams, and responses are only ever sent by the terminal, not received by it.
 
 If the message is a request and the specification defining its message type allows it, the terminal MAY produce multiple responses.
 In this case, the first response message MUST be sent immediately, and further responses may be sent at any point in time until the lifetime of the requester's client ID ends.
 All responses must be sent on the same message stream where the original request was received.
-Every response except for the first one is called **delayed response**.
+For a given request, every response except for the first one is called **delayed response**.
 
 *Rationale:* This rule accommodates subscription and callback mechanisms like `core1.sub` and `core1.pub`, where the client subscribes once and receives multiple publications asynchronously.
 
@@ -422,7 +426,7 @@ When a terminal answers requests by writing responses back into the same message
 The only exception to this are delayed responses, which may occur at any point.
 
 *Rationale:* These rules ensure that, when clients send multiple requests, they will read back the responses in the exact same order.
-This can be used to simplify the message handling code in resource-constrained client implementations.
+This simplifies the message handling code in resource-constrained client implementations.
 
 ### 3.4. Invalid messages, and handling thereof
 
