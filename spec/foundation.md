@@ -39,7 +39,7 @@ We will use the term **client** to refer to any process that is not a terminal a
 
 ### 1.2. Message streams
 
-On VT6-enabled terminals, the one-directional pipes of traditional pipelines are augmented with a two-directional structured message protocol that supersedes the [special capabilities of terminal devices defined, for example, by POSIX](https://linux.die.net/man/3/termios), as well as the traditional output markup using ANSI escape sequences.
+On VT6-enabled terminals, the one-directional pipes of traditional pipelines are augmented with a two-directional structured message protocol that supersedes the [special capabilities of terminal devices defined, for example, by POSIX](https://linux.die.net/man/3/termios).
 
 Clients running in a VT6-enabled terminal SHALL have access (or be able to get access) to a bidirectional byte stream, which is called that process's **message stream**, respectively.
 When the individual standard streams are referred to as stdin, stdout and stderr, respectively, this stream may be called **msgio**.
@@ -58,7 +58,7 @@ No exceptions SHALL be made for processes that have their stdin or stdout redire
 
 *Rationale:* Processes with input/output redirection should still be able to talk to the terminal.
 For example, consider a decryption tool that receives the input ciphertext on stdin.
-Even when stdin is a regular file, msgin and msgout should be connected to the terminal, so that it can ask the terminal to display a password prompt to the user.
+Even when stdin is a regular file, msgio should be connected to the terminal, so that it can ask the terminal to display a password prompt to the user.
 
 As an exception, shells MAY launch jobs without suitably connected message streams if the job may outlive the terminal process.
 In this case, the job's stdin and stdout SHALL NOT be connected to the terminal directly, nor indirectly through other clients.
@@ -73,7 +73,7 @@ In such an application, the initial process may want to hand control over its me
 ### 1.3 Proxies
 
 A shell is said to be a **proxy** when it acts as a man-in-the-middle between its terminal and the clients launched by it.
-That is, the shell poses as the terminal towards the clients launched by it, and poses as these clients towards its own terminal.
+That is, the shell poses as the terminal towards the clients launched by it, and poses as these clients towards their own terminal.
 
 *Rationale:* Proxies are used when the behavior of the terminal towards the clients or of the clients towards the terminal needs to be altered.
 For example, a proxy could act like a polyfill and provide support for modules that are not natively supported by the terminal.
@@ -93,7 +93,7 @@ identifier = ( letter / "_" ) *( letter / "-" / "_" )
 
 The VT6 protocol is divided into **modules**.
 Each module has a name which is accepted by `<identifier>`.
-When it is not clear from the context that a given identifier refers to a module name, the prefix `vt6/` may be prepended to it.
+In documentation or specification texts, if it is not clear from the context that a given identifier refers to a module name, the prefix `vt6/` may be prepended to it.
 
 A module is considered **official** if its specifications are developed in the same repository as this specification.
 The name of any unofficial module MUST start with a leading underscore and SHOULD indicate the organization that is responsible for its specification.
@@ -189,7 +189,7 @@ The following changes to a module specification are considered **backwards-compa
 Every other change to a module specification is considered **backwards-incompatible**, especially:
 
 - removal of a message type or property
-- change of behavior of an existing message type or property in such a way that there may exist VT6 applications that conform to the previous module version, but not to the current one
+- change of behavior of an existing message type or property in such a way that there may exist VT6 applications that conform to the previous module version, but not to the current one (or vice versa)
 
 Each module specification whose minor version number is bigger than 0 SHOULD indicate which parts of it have been added or changed compared to previous specifications of that module with the same major version number.
 
@@ -346,11 +346,11 @@ The following alternative representation for netstrings and messages may be used
 For example:
 
 ```
-actual         = {3|9:core1.set,13:example.title,13:hello "world",}
-human-readable = (core1.set example.title "hello \"world\"")
+actual         = {3|9:core1.set,14:example2.title,13:hello "world",}
+human-readable = (core1.set example2.title "hello \"world\"")
 
-actual         = {3|9:core1.set,13:example.title,0:,}
-human-readable = (core1.set example.title "")
+actual         = {3|9:core1.set,14:example2.title,0:,}
+human-readable = (core1.set example2.title "")
 ```
 
 ### 3.2. Using the standard streams
